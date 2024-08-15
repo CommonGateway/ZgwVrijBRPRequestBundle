@@ -62,21 +62,23 @@ class ZaakTypeService
 
     }//end __construct()
 
-    public function flattenJsonSchema(array $object, array $base = []) {
-        if($base === []) {
+
+    public function flattenJsonSchema(array $object, array $base=[])
+    {
+        if ($base === []) {
             $base = $object;
         }
 
-        foreach($object as $key => $value) {
-            if(is_array($value) === true) {
+        foreach ($object as $key => $value) {
+            if (is_array($value) === true) {
                 $object[$key] = $this->flattenJsonSchema($value, $base);
             } else if ($key === '$ref') {
-                $ref = explode('/',$value);
+                $ref = explode('/', $value);
 
                 array_shift($ref);
                 $referenced = $base;
 
-                foreach($ref as $item) {
+                foreach ($ref as $item) {
                     $referenced = $referenced[$item];
                 }
 
@@ -88,7 +90,8 @@ class ZaakTypeService
         }
 
         return $object;
-    }
+
+    }//end flattenJsonSchema()
 
 
 }//end class
