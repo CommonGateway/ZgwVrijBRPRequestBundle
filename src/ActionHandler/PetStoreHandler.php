@@ -3,7 +3,7 @@
 namespace CommonGateway\PetStoreBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use CommonGateway\PetStoreBundle\Service\PetStoreService;
+use CommonGateway\PetStoreBundle\Service\ZaakTypeService;
 
 /**
  * An example handler for the pet store.
@@ -18,17 +18,17 @@ class PetStoreHandler implements ActionHandlerInterface
     /**
      * The pet store service used by the handler
      *
-     * @var PetStoreService
+     * @var ZaakTypeService
      */
-    private PetStoreService $petStoreService;
+    private ZaakTypeService $petStoreService;
 
 
     /**
      * The constructor
      *
-     * @param PetStoreService $petStoreService The pet store service
+     * @param ZaakTypeService $petStoreService The pet store service
      */
-    public function __construct(PetStoreService $petStoreService)
+    public function __construct(ZaakTypeService $petStoreService)
     {
         $this->petStoreService = $petStoreService;
 
