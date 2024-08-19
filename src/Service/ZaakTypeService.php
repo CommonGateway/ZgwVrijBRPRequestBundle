@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ZaakTypeService
 {
 
+
     /**
      * @param EntityManagerInterface $entityManager The Entity Manager.
      * @param LoggerInterface        $pluginLogger  The plugin version of the logger interface.
@@ -34,8 +35,8 @@ class ZaakTypeService
     /**
      * Flatten references within a json schema.
      *
-     * @param array $object The object to flatten.
-     * @param array $base   The base object to flatten.
+     * @param  array $object The object to flatten.
+     * @param  array $base   The base object to flatten.
      * @return array
      */
     public function flattenJsonSchema(array $object, array $base=[])
@@ -68,14 +69,15 @@ class ZaakTypeService
 
     }//end flattenJsonSchema()
 
+
     /**
-     * @param string $source
+     * @param  string $source
      * @return array
      */
     public function getRequestTypes(string $source): array
     {
 
-    }
+    }//end getRequestTypes()
 
 
 }//end class
