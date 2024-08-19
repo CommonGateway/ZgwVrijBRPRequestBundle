@@ -54,19 +54,19 @@ class ZaakTypeService
         }
 
         foreach ($object as $key => $value) {
-            if (is_array($value) === true) {
-                $object[$key] = $this->flattenJsonSchema($value, $base);
+            if (is_array(value: $value) === true) {
+                $object[$key] = $this->flattenJsonSchema(object: $value, base: $base);
             } else if ($key === '$ref') {
-                $ref = explode('/', $value);
+                $ref = explode(separator: '/', string: $value);
 
-                array_shift($ref);
+                array_shift(array: $ref);
                 $referenced = $base;
 
                 foreach ($ref as $item) {
                     $referenced = $referenced[$item];
                 }
 
-                $referenced = $this->flattenJsonSchema($referenced, $base);
+                $referenced = $this->flattenJsonSchema(object: $referenced, base: $base);
 
                 $object = array_merge($object, $referenced);
                 unset($object['$ref']);
@@ -118,17 +118,18 @@ class ZaakTypeService
         $objects = $this->cacheService->retrieveObjectsFromCache(filters: $filters, options: []);
 
         if ($objects['total'] === 0) {
-            return new ObjectEntity($schema);
+            return new ObjectEntity(entity: $schema);
         }
 
         $id     = $objects['results'][0]['_id'];
-        $object = $this->entityManager->getRepository(ObjectEntity::class)->find($id);
+        $object = $this->entityManager->getRepository(class: ObjectEntity::class)->find(id: $id);
 
-        if ($object !== null) {
-            $object = $this->entityManager->getRepository(ObjectEntity::class)->find($id);
+        if($object !== null) {
+
+            return $object;
         }
 
-        return new ObjectEntity($schema);
+        return new ObjectEntity(entity: $schema);
 
     }//end getCaseType()
 
@@ -148,10 +149,10 @@ class ZaakTypeService
         $requestType['schema'] = $this->flattenJsonSchema(object: $requestType['schema']);
         $caseTypeArray         = $this->mappingService->mapping(mapping: $mapping, input: $requestType);
 
-        $caseType = $this->getCaseType($caseTypeArray['identificatie']);
+        $caseType = $this->getCaseType(code: $caseTypeArray['identificatie']);
         $caseType->hydrate($caseTypeArray);
 
-        $this->entityManager->persist($caseType);
+        $this->entityManager->persist(object: $caseType);
         $this->entityManager->flush();
 
         return $caseType;

@@ -14,23 +14,15 @@ use CommonGateway\ZgwVrijBRPRequestBundle\Service\ZaakTypeService;
  */
 class ZaakTypeHandler implements ActionHandlerInterface
 {
-
-    /**
-     * The pet store service used by the handler
-     *
-     * @var ZaakTypeService
-     */
-    private ZaakTypeService $zaakTypeService;
-
-
     /**
      * The constructor
      *
-     * @param ZaakTypeService $petStoreService The pet store service
+     * @param ZaakTypeService $zaakTypeService The pet store service
      */
-    public function __construct(ZaakTypeService $petStoreService)
+    public function __construct(
+        private readonly ZaakTypeService $zaakTypeService
+    )
     {
-        $this->zaakTypeService = $petStoreService;
 
     }//end __construct()
 
@@ -48,7 +40,20 @@ class ZaakTypeHandler implements ActionHandlerInterface
             'title'       => 'PetStore ActionHandler',
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
-            'properties'  => [],
+            'properties'  => [
+                'source'         => [
+                    'type'        => 'string',
+                    'description' => 'The source where the request types should be found.',
+                    'example'     => 'https://vrijbrp.nl/sources/vrijbrp.requestInbox.source.json',
+                    'required'    => true,
+                ],
+                'mapping'         => [
+                    'type'        => 'string',
+                    'description' => 'The mapping to translate request types to case types',
+                    'example'     => 'https://commongateway.nl/mapping/RequestTypeToZaakType.mapping.json',
+                    'required'    => true,
+                ],
+            ],
         ];
 
     }//end getConfiguration()
