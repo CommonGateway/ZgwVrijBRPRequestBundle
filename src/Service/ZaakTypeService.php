@@ -81,7 +81,7 @@ class ZaakTypeService
     /**
      * Fetch request types from the source.
      *
-     * @param  string $source The source to request.
+     * @param string $source The source to request.
      *
      * @return array The resulting request types.
      */
@@ -94,6 +94,7 @@ class ZaakTypeService
         return $this->callService->decodeResponse(source: $source, response: $response)['hydra:member'];
 
     }//end getRequestTypes()
+
 
     /**
      * Fetch an existing case type from the database, or create a new one.
@@ -114,23 +115,23 @@ class ZaakTypeService
             'identificatie'    => $code,
         ];
 
-
         $objects = $this->cacheService->retrieveObjectsFromCache(filters: $filters, options: []);
 
-        if($objects['total'] === 0) {
+        if ($objects['total'] === 0) {
             return new ObjectEntity($schema);
         }
 
         $id     = $objects['results'][0]['_id'];
         $object = $this->entityManager->getRepository(ObjectEntity::class)->find($id);
 
-        if($object !== null) {
-
+        if ($object !== null) {
             $object = $this->entityManager->getRepository(ObjectEntity::class)->find($id);
         }
 
         return new ObjectEntity($schema);
-    }
+
+    }//end getCaseType()
+
 
     /**
      * Hydrate a case type from the request type.
@@ -154,7 +155,9 @@ class ZaakTypeService
         $this->entityManager->flush();
 
         return $caseType;
-    }
+
+    }//end hydrateCaseType()
+
 
     /**
      * Maps the request types to case types and stores them.
@@ -173,7 +176,9 @@ class ZaakTypeService
         }
 
         return $hydratedCaseTypes;
-    }
+
+    }//end hydrateCaseTypes()
+
 
     /**
      * Creates case types from externally fetched request types
@@ -193,7 +198,8 @@ class ZaakTypeService
         $data['caseTypes'] = $this->hydrateCaseTypes(requestTypes: $requestTypes, mappingReference: $mappingReference);
 
         return $data;
-    }
+
+    }//end syncCaseTypeHandler()
 
 
 }//end class
