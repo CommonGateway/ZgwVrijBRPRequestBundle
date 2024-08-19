@@ -124,8 +124,7 @@ class ZaakTypeService
         $id     = $objects['results'][0]['_id'];
         $object = $this->entityManager->getRepository(class: ObjectEntity::class)->find(id: $id);
 
-        if($object !== null) {
-
+        if ($object !== null) {
             return $object;
         }
 
