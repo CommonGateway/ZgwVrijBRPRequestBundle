@@ -3,7 +3,7 @@
 namespace CommonGateway\ZgwVrijBRPRequestBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use CommonGateway\PetStoreBundle\Service\ZaakTypeService;
+use CommonGateway\ZgwVrijBRPRequestBundle\Service\ZaakTypeService;
 
 /**
  * An example handler for the pet store.
@@ -12,7 +12,7 @@ use CommonGateway\PetStoreBundle\Service\ZaakTypeService;
  *
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  */
-class PetStoreHandler implements ActionHandlerInterface
+class ZaakTypeHandler implements ActionHandlerInterface
 {
 
     /**
@@ -20,7 +20,7 @@ class PetStoreHandler implements ActionHandlerInterface
      *
      * @var ZaakTypeService
      */
-    private ZaakTypeService $petStoreService;
+    private ZaakTypeService $zaakTypeService;
 
 
     /**
@@ -30,7 +30,7 @@ class PetStoreHandler implements ActionHandlerInterface
      */
     public function __construct(ZaakTypeService $petStoreService)
     {
-        $this->petStoreService = $petStoreService;
+        $this->zaakTypeService = $petStoreService;
 
     }//end __construct()
 
@@ -66,7 +66,7 @@ class PetStoreHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->petStoreService->petStoreHandler($data, $configuration);
+        return $this->zaakTypeService->syncCaseTypeHandler($data, $configuration);
 
     }//end run()
 
