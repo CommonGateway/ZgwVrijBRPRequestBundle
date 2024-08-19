@@ -1,6 +1,6 @@
 <?php
 
-namespace CommonGateway\PetStoreBundle\Service;
+namespace CommonGateway\ZgwVrijBRPRequestBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -19,50 +19,25 @@ class ZaakTypeService
 {
 
     /**
-     * The configuration array.
-     *
-     * @var array
-     */
-    private array $configuration;
-
-    /**
-     * The data array.
-     *
-     * @var array
-     */
-    private array $data;
-
-    /**
-     * The Entity Manager.
-     *
-     * @var EntityManagerInterface
-     */
-    private EntityManagerInterface $entityManager;
-
-    /**
-     * The plugin logger.
-     *
-     * @var LoggerInterface
-     */
-    private LoggerInterface $logger;
-
-
-    /**
      * @param EntityManagerInterface $entityManager The Entity Manager.
      * @param LoggerInterface        $pluginLogger  The plugin version of the logger interface.
      */
     public function __construct(
-        EntityManagerInterface $entityManager,
-        LoggerInterface $pluginLogger
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LoggerInterface $pluginLogger,
+        private readonly GatewayResourceService $gatewayResourceService
     ) {
-        $this->entityManager = $entityManager;
-        $this->logger        = $pluginLogger;
-        $this->configuration = [];
-        $this->data          = [];
 
     }//end __construct()
 
 
+    /**
+     * Flatten references within a json schema.
+     *
+     * @param array $object The object to flatten.
+     * @param array $base   The base object to flatten.
+     * @return array
+     */
     public function flattenJsonSchema(array $object, array $base=[])
     {
         if ($base === []) {
@@ -92,6 +67,15 @@ class ZaakTypeService
         return $object;
 
     }//end flattenJsonSchema()
+
+    /**
+     * @param string $source
+     * @return array
+     */
+    public function getRequestTypes(string $source): array
+    {
+
+    }
 
 
 }//end class
