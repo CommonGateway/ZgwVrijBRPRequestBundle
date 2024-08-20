@@ -1,0 +1,16 @@
+{
+  "title": "Roltype",
+  "description": "Makes sure there are not multiple variants of the same categorie.",
+  "$id": "https://commongateway.nl/mapping/Roltype.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": true,
+  "mapping": {
+    "omschrijving": "{{ type|upper|replace({'_', ' '}) }}",
+    "omschrijvingGeneriek": "type",
+    "beginGeldigheid": "{{ 'now'|date('Y-m-d') }}",
+    "beginObject": "{{ 'now'|date('Y-m-d') }}"
+  },
+  "cast": {
+  }
+}

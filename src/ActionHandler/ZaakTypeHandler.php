@@ -3,7 +3,7 @@
 namespace CommonGateway\ZgwVrijBRPRequestBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use CommonGateway\PetStoreBundle\Service\ZaakTypeService;
+use CommonGateway\ZgwVrijBRPRequestBundle\Service\ZaakTypeService;
 
 /**
  * An example handler for the pet store.
@@ -12,25 +12,18 @@ use CommonGateway\PetStoreBundle\Service\ZaakTypeService;
  *
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  */
-class PetStoreHandler implements ActionHandlerInterface
+class ZaakTypeHandler implements ActionHandlerInterface
 {
-
-    /**
-     * The pet store service used by the handler
-     *
-     * @var ZaakTypeService
-     */
-    private ZaakTypeService $petStoreService;
 
 
     /**
      * The constructor
      *
-     * @param ZaakTypeService $petStoreService The pet store service
+     * @param ZaakTypeService $zaakTypeService The pet store service
      */
-    public function __construct(ZaakTypeService $petStoreService)
-    {
-        $this->petStoreService = $petStoreService;
+    public function __construct(
+        private readonly ZaakTypeService $zaakTypeService
+    ) {
 
     }//end __construct()
 
@@ -48,7 +41,20 @@ class PetStoreHandler implements ActionHandlerInterface
             'title'       => 'PetStore ActionHandler',
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
-            'properties'  => [],
+            'properties'  => [
+                'source'  => [
+                    'type'        => 'string',
+                    'description' => 'The source where the request types should be found.',
+                    'example'     => 'https://vrijbrp.nl/sources/vrijbrp.requestInbox.source.json',
+                    'required'    => true,
+                ],
+                'mapping' => [
+                    'type'        => 'string',
+                    'description' => 'The mapping to translate request types to case types',
+                    'example'     => 'https://commongateway.nl/mapping/RequestTypeToZaakType.mapping.json',
+                    'required'    => true,
+                ],
+            ],
         ];
 
     }//end getConfiguration()
@@ -66,7 +72,7 @@ class PetStoreHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->petStoreService->petStoreHandler($data, $configuration);
+        return $this->zaakTypeService->syncCaseTypeHandler($data, $configuration);
 
     }//end run()
 
