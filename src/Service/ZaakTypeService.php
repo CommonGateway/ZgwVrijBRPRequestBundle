@@ -115,7 +115,7 @@ class ZaakTypeService
             'identificatie'    => $code,
         ];
 
-        $objects = $this->cacheService->retrieveObjectsFromCache(filters: $filters, options: []);
+        $objects = $this->cacheService->retrieveObjectsFromCache(filter: $filters, options: []);
 
         if ($objects['total'] === 0) {
             return new ObjectEntity(entity: $schema);
@@ -124,8 +124,7 @@ class ZaakTypeService
         $id     = $objects['results'][0]['_id'];
         $object = $this->entityManager->getRepository(class: ObjectEntity::class)->find(id: $id);
 
-        if($object !== null) {
-
+        if ($object !== null) {
             return $object;
         }
 
@@ -147,12 +146,12 @@ class ZaakTypeService
         $mapping = $this->gatewayResourceService->getMapping(reference: $mappingReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
 
         $requestType['schema'] = $this->flattenJsonSchema(object: $requestType['schema']);
-        $caseTypeArray         = $this->mappingService->mapping(mapping: $mapping, input: $requestType);
+        $caseTypeArray         = $this->mappingService->mapping(mappingObject: $mapping, input: $requestType);
 
         $caseType = $this->getCaseType(code: $caseTypeArray['identificatie']);
         $caseType->hydrate($caseTypeArray);
 
-        $this->entityManager->persist(object: $caseType);
+        $this->entityManager->persist($caseType);
         $this->entityManager->flush();
 
         return $caseType;
