@@ -2,10 +2,12 @@
 
 namespace CommonGateway\ZgwVrijBRPRequestBundle\Service;
 
+use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
+use CommonGateway\CoreBundle\Service\HydrationService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -35,6 +37,7 @@ class ZaakTypeService
         private readonly CallService $callService,
         private readonly MappingService $mappingService,
         private readonly CacheService $cacheService,
+        private readonly HydrationService $hydrationService,
     ) {
 
     }//end __construct()
@@ -85,52 +88,13 @@ class ZaakTypeService
      *
      * @return array The resulting request types.
      */
-    public function getRequestTypes(string $sourceReference): array
+    public function getRequestTypes(Source $source): array
     {
-        $source = $this->gatewayResourceService->getSource(reference: $sourceReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
-
         $response = $this->callService->call(source: $source, endpoint: '/api/request_types');
 
         return $this->callService->decodeResponse(source: $source, response: $response)['hydra:member'];
 
     }//end getRequestTypes()
-
-
-    /**
-     * Fetch an existing case type from the database, or create a new one.
-     *
-     * @param string $code The identification code for the case type.
-     *
-     * @return ObjectEntity The request type (empty or filled)
-     */
-    public function getCaseType(string $code): ObjectEntity
-    {
-        $schema = $this->gatewayResourceService->getSchema(
-            reference: 'https://vng.opencatalogi.nl/schemas/ztc.zaakType.schema.json',
-            pluginName: 'common-gateway/zgw-vrijbrp-request-bundle'
-        );
-
-        $filters = [
-            '_self.schema.ref' => $schema->getReference(),
-            'identificatie'    => $code,
-        ];
-
-        $objects = $this->cacheService->retrieveObjectsFromCache(filter: $filters, options: []);
-
-        if ($objects['total'] === 0) {
-            return new ObjectEntity(entity: $schema);
-        }
-
-        $id     = $objects['results'][0]['_id'];
-        $object = $this->entityManager->getRepository(class: ObjectEntity::class)->find(id: $id);
-
-        if ($object !== null) {
-            return $object;
-        }
-
-        return new ObjectEntity(entity: $schema);
-
-    }//end getCaseType()
 
 
     /**
@@ -141,18 +105,20 @@ class ZaakTypeService
      *
      * @return ObjectEntity The resulting case type.
      */
-    public function hydrateCaseType(array $requestType, string $mappingReference): ObjectEntity
+    public function hydrateCaseType(array $requestType, string $mappingReference, Source $source): ObjectEntity
     {
-        $mapping = $this->gatewayResourceService->getMapping(reference: $mappingReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
+        $mapping = $this->gatewayResourceService->getMapping(
+            reference: $mappingReference,
+            pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
+        $schema  = $this->gatewayResourceService->getSchema(
+            reference: 'https://vng.opencatalogi.nl/schemas/ztc.zaakType.schema.json',
+            pluginName: 'common-gateway/zgw-vrijbrp-request-bundle'
+        );
 
         $requestType['schema'] = $this->flattenJsonSchema(object: $requestType['schema']);
         $caseTypeArray         = $this->mappingService->mapping(mappingObject: $mapping, input: $requestType);
 
-        $caseType = $this->getCaseType(code: $caseTypeArray['identificatie']);
-        $caseType->hydrate($caseTypeArray);
-
-        $this->entityManager->persist($caseType);
-        $this->entityManager->flush();
+        $caseType = $this->hydrationService->searchAndReplaceSynchronizations(object: $caseTypeArray, source: $source, entity: $schema);
 
         return $caseType;
 
@@ -167,12 +133,12 @@ class ZaakTypeService
      *
      * @return array The resulting case types.
      */
-    public function hydrateCaseTypes(array $requestTypes, string $mappingReference): array
+    public function hydrateCaseTypes(array $requestTypes, string $mappingReference, Source $source): array
     {
         $hydratedCaseTypes = [];
 
         foreach ($requestTypes as $requestType) {
-            $hydratedCaseTypes[] = $this->hydrateCaseType(requestType: $requestType, mappingReference: $mappingReference);
+            $hydratedCaseTypes[] = $this->hydrateCaseType(requestType: $requestType, mappingReference: $mappingReference, source: $source);
         }
 
         return $hydratedCaseTypes;
@@ -193,9 +159,11 @@ class ZaakTypeService
         $mappingReference = $configuration['mapping'];
         $sourceReference  = $configuration['source'];
 
-        $requestTypes = $this->getRequestTypes(sourceReference: $sourceReference);
+        $source = $this->gatewayResourceService->getSource(reference: $sourceReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
 
-        $data['caseTypes'] = $this->hydrateCaseTypes(requestTypes: $requestTypes, mappingReference: $mappingReference);
+        $requestTypes = $this->getRequestTypes(source: $source);
+
+        $data['caseTypes'] = $this->hydrateCaseTypes(requestTypes: $requestTypes, mappingReference: $mappingReference, source: $source);
 
         return $data;
 

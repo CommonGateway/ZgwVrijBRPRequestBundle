@@ -6,7 +6,8 @@
   "version": "0.0.1",
   "passTrough": true,
   "mapping": {
-    "omschrijving": "{{ type|upper|replace({'_', ' '}) }}",
+    "_sourceId": "type",
+    "omschrijving": "{{ type|upper|replace({'_': ' '}) }}",
     "omschrijvingGeneriek": "type",
     "beginGeldigheid": "{{ 'now'|date('Y-m-d') }}",
     "beginObject": "{{ 'now'|date('Y-m-d') }}"

@@ -6,6 +6,7 @@
   "version": "0.0.1",
   "passTrough": true,
   "mapping": {
+    "_sourceId": "name",
     "naam": "name",
     "definitie": "description",
     "specificatie.formaat": "type.0",
