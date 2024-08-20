@@ -14,6 +14,8 @@ use CommonGateway\ZgwVrijBRPRequestBundle\Service\ZaakTypeService;
  */
 class ZaakTypeHandler implements ActionHandlerInterface
 {
+
+
     /**
      * The constructor
      *
@@ -21,8 +23,7 @@ class ZaakTypeHandler implements ActionHandlerInterface
      */
     public function __construct(
         private readonly ZaakTypeService $zaakTypeService
-    )
-    {
+    ) {
 
     }//end __construct()
 
@@ -41,13 +42,13 @@ class ZaakTypeHandler implements ActionHandlerInterface
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
             'properties'  => [
-                'source'         => [
+                'source'  => [
                     'type'        => 'string',
                     'description' => 'The source where the request types should be found.',
                     'example'     => 'https://vrijbrp.nl/sources/vrijbrp.requestInbox.source.json',
                     'required'    => true,
                 ],
-                'mapping'         => [
+                'mapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping to translate request types to case types',
                     'example'     => 'https://commongateway.nl/mapping/RequestTypeToZaakType.mapping.json',
