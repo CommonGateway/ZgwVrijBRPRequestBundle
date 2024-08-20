@@ -12,15 +12,15 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * An example service for adding business logic to your class.
+ * A service for mapping requests to ZGW cases.
  *
- * @author Conduction.nl <info@conduction.nl>
+ * @author Wilco Louwerse <wilco@conduction.nl>
  *
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  *
  * @category Service
  */
-class ZaakTypeService
+class ZaakService
 {
 
 
@@ -79,17 +79,17 @@ class ZaakTypeService
 
 
     /**
-     * Fetch request types from the source.
+     * Fetch request from the source.
      *
      * @param string $sourceReference The source to request.
      *
      * @return array The resulting request types.
      */
-    public function getRequestTypes(string $sourceReference): array
+    public function getRequests(string $sourceReference): array
     {
         $source = $this->gatewayResourceService->getSource(reference: $sourceReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
 
-        $response = $this->callService->call(source: $source, endpoint: '/api/request_types');
+        $response = $this->callService->call(source: $source, endpoint: '/api/requests');
 
         return $this->callService->decodeResponse(source: $source, response: $response)['hydra:member'];
 
@@ -97,16 +97,16 @@ class ZaakTypeService
 
 
     /**
-     * Fetch an existing case type from the database, or create a new one.
+     * Fetch an existing case from the database, or create a new one.
      *
-     * @param string $code The identification code for the case type.
+     * @param string $code The identification code for the case.
      *
-     * @return ObjectEntity The request type (empty or filled)
+     * @return ObjectEntity The request (empty or filled)
      */
-    public function getCaseType(string $code): ObjectEntity
+    public function getCase(string $code): ObjectEntity
     {
         $schema = $this->gatewayResourceService->getSchema(
-            reference: 'https://vng.opencatalogi.nl/schemas/ztc.zaakType.schema.json',
+            reference: 'https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json',
             pluginName: 'common-gateway/zgw-vrijbrp-request-bundle'
         );
 
@@ -130,76 +130,76 @@ class ZaakTypeService
 
         return new ObjectEntity(entity: $schema);
 
-    }//end getCaseType()
+    }//end getCase()
 
 
     /**
-     * Hydrate a case type from the request type.
+     * Hydrate a case from the request.
      *
-     * @param array  $requestType      The request type from the source.
+     * @param array  $request      The request from the source.
      * @param string $mappingReference The mapping reference of the correct mapping.
      *
-     * @return ObjectEntity The resulting case type.
+     * @return ObjectEntity The resulting case.
      */
-    public function hydrateCaseType(array $requestType, string $mappingReference): ObjectEntity
+    public function hydrateCase(array $request, string $mappingReference): ObjectEntity
     {
         $mapping = $this->gatewayResourceService->getMapping(reference: $mappingReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
 
-        $requestType['schema'] = $this->flattenJsonSchema(object: $requestType['schema']);
-        $caseTypeArray         = $this->mappingService->mapping(mappingObject: $mapping, input: $requestType);
+        $request['schema'] = $this->flattenJsonSchema(object: $request['schema']);
+        $caseArray         = $this->mappingService->mapping(mappingObject: $mapping, input: $request);
 
-        $caseType = $this->getCaseType(code: $caseTypeArray['identificatie']);
-        $caseType->hydrate($caseTypeArray);
+        $case = $this->getCase(code: $caseArray['identificatie']);
+        $case->hydrate($caseArray);
 
-        $this->entityManager->persist($caseType);
+        $this->entityManager->persist($case);
         $this->entityManager->flush();
 
-        return $caseType;
+        return $case;
 
-    }//end hydrateCaseType()
+    }//end hydrateCase()
 
 
     /**
-     * Maps the request types to case types and stores them.
+     * Maps the requests to cases and stores them.
      *
-     * @param array  $requestTypes     The request types from the source
-     * @param string $mappingReference The mapping reference for the mapping to map the request type to a case type
+     * @param array  $requests     The requests from the source
+     * @param string $mappingReference The mapping reference for the mapping to map the request to a case
      *
-     * @return array The resulting case types.
+     * @return array The resulting cases.
      */
-    public function hydrateCaseTypes(array $requestTypes, string $mappingReference): array
+    public function hydrateCases(array $requests, string $mappingReference): array
     {
-        $hydratedCaseTypes = [];
+        $hydratedCases = [];
 
-        foreach ($requestTypes as $requestType) {
-            $hydratedCaseTypes[] = $this->hydrateCaseType(requestType: $requestType, mappingReference: $mappingReference);
+        foreach ($requests as $request) {
+            $hydratedCases[] = $this->hydrateCase(request: $request, mappingReference: $mappingReference);
         }
 
-        return $hydratedCaseTypes;
+        return $hydratedCases;
 
-    }//end hydrateCaseTypes()
+    }//end hydrateCases()
 
 
     /**
-     * Creates case types from externally fetched request types
+     * Creates cases from externally fetched requests.
      *
      * @param array $data          The data in the request.
      * @param array $configuration The configuration for this handler.
      *
-     * @return array The request data, updated with the case types.
+     * @return array The request data, updated with the cases.
      */
-    public function syncCaseTypeHandler(array $data, array $configuration): array
+    public function syncCaseHandler(array $data, array $configuration): array
     {
         $mappingReference = $configuration['mapping'];
         $sourceReference  = $configuration['source'];
 
-        $requestTypes = $this->getRequestTypes(sourceReference: $sourceReference);
+        $requests = $this->getRequests(sourceReference: $sourceReference);
 
-        $data['caseTypes'] = $this->hydrateCaseTypes(requestTypes: $requestTypes, mappingReference: $mappingReference);
+        $data['cases'] = $this->hydrateCases(requests: $requests, mappingReference: $mappingReference);
 
         return $data;
 
-    }//end syncCaseTypeHandler()
+    }//end syncCaseHandler()
 
 
 }//end class

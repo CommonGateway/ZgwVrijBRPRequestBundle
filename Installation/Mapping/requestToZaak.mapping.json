@@ -1,0 +1,19 @@
+{
+  "title": "Request to Zaak",
+  "description": "Mapping for Request to ZGW Zaak",
+  "$id": "https://commongateway.nl/mapping/RequestToZaak.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": true,
+  "mapping": {
+    "identificatie": "externalId",
+    "omschrijving": "description",
+    "registratiedatum": "{% if registeredOn|default%}{{ registeredOn|date('Y-m-d') }}{% else %}{{ 'now'|date('Y-m-d') }}{% endif %}",
+    "eigenschappen": "[{% for key,property in body %}{% if loop.first == false %},{% endif %}{\"naam\":\"{{ key }}\", \"waarde\":\"{{ property }}\"}{% endfor %}]",
+    "zaakinformatieobjecten": "[{% for document in documents %}{% if loop.first == false %},{% endif %}{{ map('https://commongateway.nl/mapping/ZaakInformatieObject.mapping.json', document)|json_encode }}{% endfor %}]"
+  },
+  "cast": {
+    "eigenschappen": "jsonToArray",
+    "zaakinformatieobjecten": "jsonToArray"
+  }
+}
