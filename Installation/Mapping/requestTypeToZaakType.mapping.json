@@ -26,7 +26,8 @@
     "catalogus": "",
     "beginGeldigheid": "{{ 'now'|date('Y-m-d') }}",
     "versiedatum": "{{ 'now'|date('Y-m-d') }}",
-    "eigenschappen": "[{% for key,property in schema.properties %}{% if loop.first == false %},{% endif %}{% set property = property|merge({'name': key}) %}{{ map('https://commongateway.nl/mapping/RequestTypePropertyToEigenschap.mapping.json', property)|json_encode }}{% endfor %}]"
+    "eigenschappen": "[{% for key,property in schema.properties %}{% if loop.first == false %},{% endif %}{% set property = property|merge({'name': key}) %}{{ map('https://commongateway.nl/mapping/RequestTypePropertyToEigenschap.mapping.json', property)|json_encode }}{% endfor %}]",
+    "roltypen": "[{% for type in ['initiator', 'mede_initiator', 'belanghebbende'] %}{% if loop.first == false %},{% endif %}{% set roltype = {'type': type} %}{{ map('https://commongateway.nl/mapping/Roltype.mapping.json', property)|json_encode }}{% endfor %}]"
 
   },
   "cast": {
