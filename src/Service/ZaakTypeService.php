@@ -109,7 +109,8 @@ class ZaakTypeService
     {
         $mapping = $this->gatewayResourceService->getMapping(
             reference: $mappingReference,
-            pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
+            pluginName:'common-gateway/zgw-vrijbrp-request-bundle'
+        );
         $schema  = $this->gatewayResourceService->getSchema(
             reference: 'https://vng.opencatalogi.nl/schemas/ztc.zaakType.schema.json',
             pluginName: 'common-gateway/zgw-vrijbrp-request-bundle'
