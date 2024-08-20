@@ -6,12 +6,11 @@
   "version": "0.0.1",
   "passTrough": true,
   "mapping": {
-    "omschrijving": "{{ type|upper|replace({'_', ' '}}",
+    "omschrijving": "{{ type|upper|replace({'_', ' '}) }}",
     "omschrijvingGeneriek": "type",
     "beginGeldigheid": "{{ 'now'|date('Y-m-d') }}",
     "beginObject": "{{ 'now'|date('Y-m-d') }}"
   },
   "cast": {
-    "specificatie.waardenverzameling": "unsetIfValue==enum"
   }
 }

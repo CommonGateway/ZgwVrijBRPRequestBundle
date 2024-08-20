@@ -32,6 +32,7 @@
   },
   "cast": {
     "eigenschappen": "jsonToArray",
+    "roltypen": "jsonToArray",
     "opschortingEnAanhoudingMogelijk": "boolean",
     "verlengingMogelijk": "boolean",
     "publicatieIndicatie": "boolean"
