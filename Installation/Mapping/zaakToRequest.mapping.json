@@ -1,0 +1,29 @@
+{
+  "title": "Zaak to Request",
+  "description": "Mapping for ZGW Zaak to Request",
+  "$id": "https://commongateway.nl/mapping/ZaakToRequest.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": true,
+  "mapping": {
+    "source": "gravity",
+    "externalId": "identificatie",
+    "identificatie": "externalId",
+    "registeredOn": "registratiedatum",
+    "preferredChannel": "https://vrijbrp.nl",
+    "description": "omschrijving",
+    "status": "received",
+    "type": "/api/request_types/vrijbrp-travel-document-application",
+    "customers.0.customer": "{{ 'https://vrijbrp.nl/bsn/' ~ rol.betrokkeneIdentificatie.inpbsn }}",
+    "customers.0.role": "initiator",
+    "customers.0.authorizationIndication": "authorizer",
+    "withdrawRequest": null,
+    "supplementedRequest": null,
+    "body": "[{% for eigenschap in eigenschappen %}{% if loop.first == false %},{% endif %}\"{{ eigenschap.naam }}\":\"{{ eigenschap.waarde }}\"{% endfor %}]",
+    "documents": "[{% for zaakinformatieobject in zaakinformatieobjecten %}{% if loop.first == false %},{\"file\":\"zaakinformatieobject.informatieobject.inhoud\"}{% endfor %}]"
+  },
+  "cast": {
+    "body": "jsonToArray",
+    "documents": "jsonToArray"
+  }
+}

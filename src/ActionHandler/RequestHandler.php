@@ -3,26 +3,26 @@
 namespace CommonGateway\ZgwVrijBRPRequestBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use CommonGateway\ZgwVrijBRPRequestBundle\Service\ZaakService;
+use CommonGateway\ZgwVrijBRPRequestBundle\Service\RequestService;
 
 /**
- * A handler for mapping requests to ZGW cases.
+ * A handler for mapping a ZGW case to a Request.
  *
  * @author Wilco Louwerse <wilco@conduction.nl>
  *
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  */
-class ZaakHandler implements ActionHandlerInterface
+class RequestHandler implements ActionHandlerInterface
 {
 
 
     /**
      * The constructor
      *
-     * @param ZaakService $zaakService The pet store service
+     * @param RequestService $requestService The request service
      */
     public function __construct(
-        private readonly ZaakService $zaakService
+        private readonly RequestService $requestService
     ) {
 
     }//end __construct()
@@ -44,14 +44,14 @@ class ZaakHandler implements ActionHandlerInterface
             'properties'  => [
                 'source'  => [
                     'type'        => 'string',
-                    'description' => 'The source where the requests should be found.',
+                    'description' => 'The source where the requests should be created.',
                     'example'     => 'https://vrijbrp.nl/sources/vrijbrp.requestInbox.source.json',
                     'required'    => true,
                 ],
                 'mapping' => [
                     'type'        => 'string',
-                    'description' => 'The mapping to translate requests to cases',
-                    'example'     => 'https://commongateway.nl/mapping/RequestToZaak.mapping.json',
+                    'description' => 'The mapping to translate case to request',
+                    'example'     => 'https://commongateway.nl/mapping/ZaakToRequest.mapping.json',
                     'required'    => true,
                 ],
             ],
@@ -72,7 +72,7 @@ class ZaakHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->zaakService->syncCaseHandler($data, $configuration);
+        return $this->requestService->createRequestHandler($data, $configuration);
 
     }//end run()
 
