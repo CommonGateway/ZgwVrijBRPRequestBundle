@@ -14,7 +14,7 @@
       1
     ]
   },
-  "config": {
+  "configuration": {
     "source": "https://vrijbrp.nl/sources/vrijbrp.requestInbox.source.json",
     "mapping": "https://commongateway.nl/mapping/RequestTypeToZaakType.mapping.json"
   },
