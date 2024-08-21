@@ -28,11 +28,13 @@
     "beginGeldigheid": "{{ 'now'|date('Y-m-d') }}",
     "versiedatum": "{{ 'now'|date('Y-m-d') }}",
     "eigenschappen": "[{% for key,property in schema.properties %}{% if loop.first == false %},{% endif %}{% set property = property|merge({'name': key, 'requesttypeName': name}) %}{{ map('https://commongateway.nl/mapping/RequestTypePropertyToEigenschap.mapping.json', property)|json_encode }}{% endfor %}]",
-    "roltypen": "[{% for type in ['initiator', 'mede_initiator', 'belanghebbende'] %}{% if loop.first == false %},{% endif %}{% set roltype = {'type': type, 'requesttypeName': name} %}{{ map('https://commongateway.nl/mapping/Roltype.mapping.json', roltype)|json_encode }}{% endfor %}]"
+    "roltypen": "[{% for type in ['initiator', 'mede_initiator', 'belanghebbende'] %}{% if loop.first == false %},{% endif %}{% set roltype = {'type': type, 'requesttypeName': name} %}{{ map('https://commongateway.nl/mapping/Roltype.mapping.json', roltype)|json_encode }}{% endfor %}]",
+    "informatieobjecttypen": "[{% for type in ['aanvraag'] %}{% if loop.first == false %},{% endif %}{% set roltype = {'type': type, 'requesttypeName': name} %}{{ map('https://commongateway.nl/mapping/InformatieObjecttype.mapping.json', roltype)|json_encode }}{% endfor %}]"
   },
   "cast": {
     "eigenschappen": "jsonToArray",
     "roltypen": "jsonToArray",
+    "informatieobjecttypen": "jsonToArray",
     "opschortingEnAanhoudingMogelijk": "boolean",
     "verlengingMogelijk": "boolean",
     "publicatieIndicatie": "boolean"
