@@ -6,7 +6,7 @@
   "version": "0.0.1",
   "passTrough": true,
   "mapping": {
-    "_sourceId": "type",
+    "_sourceId": "{{ type }}_{{ requesttypeName }}",
     "omschrijving": "{{ type|upper|replace({'_': ' '}) }}",
     "omschrijvingGeneriek": "type",
     "beginGeldigheid": "{{ 'now'|date('Y-m-d') }}",
