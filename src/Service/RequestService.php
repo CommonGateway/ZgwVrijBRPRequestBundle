@@ -27,9 +27,9 @@ class RequestService
 
     /**
      * @param GatewayResourceService $gatewayResourceService The resource Service.
-     * @param CallService $callService The call Service.
-     * @param MappingService $mappingService The mapping service.
-     * @param LoggerInterface $pluginLogger The logger interface.
+     * @param CallService            $callService            The call Service.
+     * @param MappingService         $mappingService         The mapping service.
+     * @param LoggerInterface        $pluginLogger           The logger interface.
      */
     public function __construct(
         private readonly GatewayResourceService $gatewayResourceService,
@@ -44,8 +44,8 @@ class RequestService
     /**
      * Creates a document in the Source.
      *
-     * @param Source $source The source to request.
-     * @param array $document The array containing information to create a document.
+     * @param Source $source   The source to request.
+     * @param array  $document The array containing information to create a document.
      *
      * @return array The response of the api-call to the source after creating a document.
      */
@@ -54,8 +54,11 @@ class RequestService
         if (isset($document['file']) === true) {
             $document['file'] = base64_decode($document['file']);
         }
-        
-        $response = $this->callService->call(source: $source, endpoint: '/api/documents', method: 'POST',
+
+        $response = $this->callService->call(
+            source: $source,
+            endpoint: '/api/documents',
+            method: 'POST',
             config: [
                 'body' => json_encode($document),
             ]
@@ -70,15 +73,18 @@ class RequestService
      * Creates a Request in the Source.
      *
      * @param Source $source The source to request.
-     * @param array $body The array containing information to create a request.
+     * @param array  $body   The array containing information to create a request.
      *
      * @return void
      */
     private function createRequest(Source $source, array $body): void
     {
-        $this->callService->call(source: $source, endpoint: '/api/requests', method: 'POST',
+        $this->callService->call(
+            source: $source,
+            endpoint: '/api/requests',
+            method: 'POST',
             config: [
-                'body' => json_encode($body)
+                'body' => json_encode($body),
             ]
         );
 
@@ -95,22 +101,22 @@ class RequestService
      */
     public function createRequestHandler(array $data, array $configuration): array
     {
-        $source = $this->gatewayResourceService->getSource(reference: $configuration['source'], pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
+        $source  = $this->gatewayResourceService->getSource(reference: $configuration['source'], pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
         $mapping = $this->gatewayResourceService->getMapping(reference: $configuration['mapping'], pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
         if ($source === null || $mapping === null) {
-            $message = 'Could not find a Source & Mapping for ' . $configuration['source'] . ' & ' . $configuration['mapping'];
+            $message = 'Could not find a Source & Mapping for '.$configuration['source'].' & '.$configuration['mapping'];
             $this->pluginLogger->error(message: $message, context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']);
             $data['response'] = new Response(\Safe\json_encode(['Message' => $message]), 500, ['Content-type' => 'application/json']);
-            
+
             return $data;
         }
-        
+
         $body = $this->mappingService->mapping(mappingObject: $mapping, input: $data['body']);
-        
+
         foreach ($body['documents'] as $key => $document) {
             $body['documents'][$key] = $this->createDocument(source: $source, document: $document)['contentUrl'];
         }
-        
+
         $this->createRequest(source: $source, body: $body);
 
         return $data;
