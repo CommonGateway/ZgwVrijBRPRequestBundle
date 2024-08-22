@@ -2,6 +2,7 @@
 
 namespace CommonGateway\ZgwVrijBRPRequestBundle\Service;
 
+use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
@@ -28,11 +29,13 @@ class RequestService
      * @param GatewayResourceService $gatewayResourceService The resource Service.
      * @param CallService $callService The call Service.
      * @param MappingService $mappingService The mapping service.
+     * @param LoggerInterface $pluginLogger The logger interface.
      */
     public function __construct(
         private readonly GatewayResourceService $gatewayResourceService,
         private readonly CallService $callService,
         private readonly MappingService $mappingService,
+        private readonly LoggerInterface $pluginLogger,
     ) {
     
     }//end __construct()
@@ -40,22 +43,16 @@ class RequestService
     /**
      * Creates a document in the Source.
      *
-     * @param string $sourceReference The source to request.
-     * @param string $mappingReference The mapping reference of the correct mapping.
+     * @param Source $source The source to request.
      * @param array $document The array containing information to create a document.
      *
      * @return array The response of the api-call to the source after creating a document.
      */
-    private function createDocument(string $sourceReference, string $mappingReference, array $document): array
+    private function createDocument(Source $source, array $document): array
     {
-        $source = $this->gatewayResourceService->getSource(reference: $sourceReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
-        $mapping = $this->gatewayResourceService->getMapping(reference: $mappingReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
-        if ($source === null || $mapping === null) {
-            // todo:
-            return [];
+        if (isset($document['file']) === true) {
+            $document['file'] = base64_decode($document['file']);
         }
-        
-        $document = $this->mappingService->mapping(mappingObject: $mapping, input: $document);
         
         $response = $this->callService->call(source: $source, endpoint: '/api/documents', method: 'POST',
             config: [
@@ -69,22 +66,16 @@ class RequestService
     /**
      * Creates a Request in the Source.
      *
-     * @param string $sourceReference The source to request.
-     * @param array $data The array containing information to create a request.
+     * @param Source $source The source to request.
+     * @param array $body The array containing information to create a request.
      *
      * @return void
      */
-    private function createRequest(string $sourceReference, array $data): void
+    private function createRequest(Source $source, array $body): void
     {
-        $source = $this->gatewayResourceService->getSource(reference: $sourceReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
-        if ($source === null) {
-            // todo:
-            return;
-        }
-        
         $this->callService->call(source: $source, endpoint: '/api/requests', method: 'POST',
             config: [
-                'body' => json_encode($data)
+                'body' => json_encode($body)
             ]
         );
     }
@@ -99,18 +90,23 @@ class RequestService
      */
     public function createRequestHandler(array $data, array $configuration): array
     {
-        $sourceReference  = $configuration['source'];
-        $mappingReference = $configuration['mapping'];
-        
-        foreach ($data['documents'] as $key => $document) {
-            $data['documents'][$key] = $this->createDocument(
-                sourceReference: $sourceReference,
-                mappingReference: $mappingReference,
-                document: $document
-            )['contentUrl'];
+        $source = $this->gatewayResourceService->getSource(reference: $configuration['source'], pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
+        $mapping = $this->gatewayResourceService->getMapping(reference: $configuration['mapping'], pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
+        if ($source === null || $mapping === null) {
+            $message = 'Could not find a Source & Mapping for ' . $configuration['source'] . ' & ' . $configuration['mapping'];
+            $this->pluginLogger->error(message: $message, context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']);
+            $data['response'] = new Response(\Safe\json_encode(['Message' => $message]), 500, ['Content-type' => 'application/json']);
+            
+            return $data;
         }
         
-        $this->createRequest(sourceReference: $sourceReference, data: $data);
+        $body = $this->mappingService->mapping(mappingObject: $mapping, input: $data['body']);
+        
+        foreach ($body['documents'] as $key => $document) {
+            $body['documents'][$key] = $this->createDocument(source: $source, document: $document)['contentUrl'];
+        }
+        
+        $this->createRequest(source: $source, body: $body);
 
         return $data;
 
