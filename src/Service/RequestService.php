@@ -101,6 +101,12 @@ class RequestService
      */
     public function createRequestHandler(array $data, array $configuration): array
     {
+        if (isset($data['body']['zaaktype']['identificatie']) === false
+            || str_starts_with(haystack: $data['body']['zaaktype']['identificatie'], needle: "vrijbrp-") === false
+        ) {
+            return $data;
+        }
+        
         $source  = $this->gatewayResourceService->getSource(reference: $configuration['source'], pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
         $mapping = $this->gatewayResourceService->getMapping(reference: $configuration['mapping'], pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
         if ($source === null || $mapping === null) {
