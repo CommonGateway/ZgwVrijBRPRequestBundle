@@ -23,8 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class RequestService
 {
-    
-    
+
+
     /**
      * @param GatewayResourceService $gatewayResourceService The resource Service.
      * @param CallService $callService The call Service.
@@ -37,9 +37,10 @@ class RequestService
         private readonly MappingService $mappingService,
         private readonly LoggerInterface $pluginLogger,
     ) {
-    
+
     }//end __construct()
-    
+
+
     /**
      * Creates a document in the Source.
      *
@@ -56,13 +57,15 @@ class RequestService
         
         $response = $this->callService->call(source: $source, endpoint: '/api/documents', method: 'POST',
             config: [
-                'body' => json_encode($document)
+                'body' => json_encode($document),
             ]
         );
-        
+
         return $this->callService->decodeResponse(source: $source, response: $response);
-    }
-    
+
+    }//end createDocument()
+
+
     /**
      * Creates a Request in the Source.
      *
@@ -78,7 +81,9 @@ class RequestService
                 'body' => json_encode($body)
             ]
         );
-    }
+
+    }//end createRequest()
+
 
     /**
      * Creates cases from externally fetched requests.
@@ -110,7 +115,7 @@ class RequestService
 
         return $data;
 
-    }//end syncCaseHandler()
+    }//end createRequestHandler()
 
 
 }//end class
