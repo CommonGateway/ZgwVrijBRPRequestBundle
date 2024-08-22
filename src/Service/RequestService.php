@@ -22,55 +22,61 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class RequestService
 {
-    
-    
+
+
     /**
      * @param GatewayResourceService $gatewayResourceService The resource Service.
-     * @param CallService $callService The call Service.
-     * @param MappingService $mappingService The mapping service.
+     * @param CallService            $callService            The call Service.
+     * @param MappingService         $mappingService         The mapping service.
      */
     public function __construct(
         private readonly GatewayResourceService $gatewayResourceService,
         private readonly CallService $callService,
         private readonly MappingService $mappingService,
     ) {
-    
+
     }//end __construct()
-    
+
+
     /**
      * Creates a document in the Source.
      *
-     * @param string $sourceReference The source to request.
+     * @param string $sourceReference  The source to request.
      * @param string $mappingReference The mapping reference of the correct mapping.
-     * @param array $document The array containing information to create a document.
+     * @param array  $document         The array containing information to create a document.
      *
      * @return array The response of the api-call to the source after creating a document.
      */
     private function createDocument(string $sourceReference, string $mappingReference, array $document): array
     {
-        $source = $this->gatewayResourceService->getSource(reference: $sourceReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
+        $source  = $this->gatewayResourceService->getSource(reference: $sourceReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
         $mapping = $this->gatewayResourceService->getMapping(reference: $mappingReference, pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
         if ($source === null || $mapping === null) {
             // todo:
             return [];
         }
-        
+
         $document = $this->mappingService->mapping(mappingObject: $mapping, input: $document);
-        
-        $response = $this->callService->call(source: $source, endpoint: '/api/documents', method: 'POST',
+
+        $response = $this->callService->call(
+            source: $source,
+            endpoint: '/api/documents',
+            method: 'POST',
             config: [
-                'body' => json_encode($document)
+                'body' => json_encode($document),
             ]
         );
-        
+
         return $this->callService->decodeResponse(source: $source, response: $response);
-    }
-    
+
+    }//end createDocument()
+
+
     /**
      * Creates a Request in the Source.
      *
      * @param string $sourceReference The source to request.
-     * @param array $data The array containing information to create a request.
+     * @param array  $data            The array containing information to create a request.
      *
      * @return void
      */
@@ -81,13 +87,18 @@ class RequestService
             // todo:
             return;
         }
-        
-        $this->callService->call(source: $source, endpoint: '/api/requests', method: 'POST',
+
+        $this->callService->call(
+            source: $source,
+            endpoint: '/api/requests',
+            method: 'POST',
             config: [
-                'body' => json_encode($data)
+                'body' => json_encode($data),
             ]
         );
-    }
+
+    }//end createRequest()
+
 
     /**
      * Creates cases from externally fetched requests.
@@ -101,7 +112,7 @@ class RequestService
     {
         $sourceReference  = $configuration['source'];
         $mappingReference = $configuration['mapping'];
-        
+
         foreach ($data['documents'] as $key => $document) {
             $data['documents'][$key] = $this->createDocument(
                 sourceReference: $sourceReference,
@@ -109,12 +120,12 @@ class RequestService
                 document: $document
             )['contentUrl'];
         }
-        
+
         $this->createRequest(sourceReference: $sourceReference, data: $data);
 
         return $data;
 
-    }//end syncCaseHandler()
+    }//end createRequestHandler()
 
 
 }//end class
