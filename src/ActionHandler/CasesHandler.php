@@ -42,7 +42,7 @@ class CasesHandler implements ActionHandlerInterface
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
             'properties'  => [
-                'beforeTimeModifier'  => [
+                'beforeTimeModifier' => [
                     'type'        => 'string',
                     'description' => 'The string passed to new DateTime())->modify() that is used as filter on _self.dateCreated when searching for cases.',
                     'example'     => '-10 minutes',

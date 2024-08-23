@@ -29,12 +29,12 @@ class RequestService
 
 
     /**
-     * @param GatewayResourceService $gatewayResourceService The resource Service.
-     * @param CallService            $callService            The call Service.
-     * @param MappingService         $mappingService         The mapping service.
-     * @param LoggerInterface        $pluginLogger           The logger interface.
-     * @param CacheService           $cacheService           The cache service.
-     * @param EventDispatcherInterface $eventDispatcher     The event dispatcher.
+     * @param GatewayResourceService   $gatewayResourceService The resource Service.
+     * @param CallService              $callService            The call Service.
+     * @param MappingService           $mappingService         The mapping service.
+     * @param LoggerInterface          $pluginLogger           The logger interface.
+     * @param CacheService             $cacheService           The cache service.
+     * @param EventDispatcherInterface $eventDispatcher        The event dispatcher.
      */
     public function __construct(
         private readonly GatewayResourceService $gatewayResourceService,
@@ -67,10 +67,8 @@ class RequestService
             endpoint: '/api/documents',
             method: 'POST',
             config: [
-                'body' => json_encode($document),
-                'headers' => [
-                    'Accept' => 'multipart/form-data'
-                ]
+                'body'    => json_encode($document),
+                'headers' => ['Accept' => 'multipart/form-data'],
             ]
         );
 
@@ -130,9 +128,8 @@ class RequestService
 
             return $data;
         }
-        
-        //Todo: create Sync...
 
+        // Todo: create Sync...
         // Mapping, incl documents = [{file = zaakinformatieobject.informatieobject.inhoud}]
         $requestBody = $this->mappingService->mapping(mappingObject: $mapping, input: $zaak);
 
@@ -146,8 +143,8 @@ class RequestService
         return $data;
 
     }//end createRequestHandler()
-    
-    
+
+
     /**
      * Checks if there are Cases we need to create a Request for.
      *
@@ -160,26 +157,27 @@ class RequestService
     {
         // Create the DateTime object for 10 minutes ago.
         $beforeDateTime = (new DateTime())->modify(modifier: $configuration['beforeTimeModifier']);
-        
+
         // Search all cases we should create Requests for.
         $result = $this->cacheService->searchObjects(
             filter: [
-                '_self.synchronizations' => 'IS NULL',
+                '_self.synchronizations'          => 'IS NULL',
                 'embedded.zaaktype.identificatie' => ['like' => 'vrijbrp-'],
-                '_self.dateCreated' => ['before' => $beforeDateTime->format(format: 'Y-m-d H:i:s')]
+                '_self.dateCreated'               => ['before' => $beforeDateTime->format(format: 'Y-m-d H:i:s')],
             ],
             entities: ['https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json']
         );
-        
+
         // Loop through results and start creating Requests.
         foreach ($result['results'] as $zaak) {
             // Throw (async) event for creating a Request for this Case.
             $event = new ActionEvent('commongateway.action.event', ['body' => $zaak], 'vrijbrp.caseToRequest.sync');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
         }
-        
+
         return $data;
-    }
+
+    }//end checkCasesHandler()
 
 
 }//end class
