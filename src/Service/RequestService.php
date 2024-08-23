@@ -30,12 +30,14 @@ class RequestService
      * @param CallService            $callService            The call Service.
      * @param MappingService         $mappingService         The mapping service.
      * @param LoggerInterface        $pluginLogger           The logger interface.
+     * @param CacheService           $cacheService           The cache service.
      */
     public function __construct(
         private readonly GatewayResourceService $gatewayResourceService,
         private readonly CallService $callService,
         private readonly MappingService $mappingService,
         private readonly LoggerInterface $pluginLogger,
+        private readonly CacheService $cacheService,
     ) {
 
     }//end __construct()
@@ -101,8 +103,10 @@ class RequestService
      */
     public function createRequestHandler(array $data, array $configuration): array
     {
-        if (isset($data['body']['zaaktype']['identificatie']) === false
-            || str_starts_with(haystack: $data['body']['zaaktype']['identificatie'], needle: "vrijbrp-") === false
+        $zaak = $this->cacheService->getObject($data['body']['_id']);
+        
+        if ($zaak === null || isset($zaak['zaaktype']['identificatie']) === false
+            || str_starts_with(haystack: $zaak['zaaktype']['identificatie'], needle: "vrijbrp-") === false
         ) {
             return $data;
         }
@@ -117,7 +121,7 @@ class RequestService
             return $data;
         }
 
-        $body = $this->mappingService->mapping(mappingObject: $mapping, input: $data['body']);
+        $body = $this->mappingService->mapping(mappingObject: $mapping, input: $zaak);
 
         foreach ($body['documents'] as $key => $document) {
             $body['documents'][$key] = $this->createDocument(source: $source, document: $document)['contentUrl'];
