@@ -4,13 +4,16 @@ namespace CommonGateway\ZgwVrijBRPRequestBundle\Service;
 
 use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
+use App\Event\ActionEvent;
 use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * A service for mapping requests to ZGW cases.
@@ -31,6 +34,7 @@ class RequestService
      * @param MappingService         $mappingService         The mapping service.
      * @param LoggerInterface        $pluginLogger           The logger interface.
      * @param CacheService           $cacheService           The cache service.
+     * @param EventDispatcherInterface $eventDispatcher     The event dispatcher.
      */
     public function __construct(
         private readonly GatewayResourceService $gatewayResourceService,
@@ -38,6 +42,7 @@ class RequestService
         private readonly MappingService $mappingService,
         private readonly LoggerInterface $pluginLogger,
         private readonly CacheService $cacheService,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
 
     }//end __construct()
@@ -63,6 +68,9 @@ class RequestService
             method: 'POST',
             config: [
                 'body' => json_encode($document),
+                'headers' => [
+                    'Accept' => 'multipart/form-data'
+                ]
             ]
         );
 
@@ -94,23 +102,25 @@ class RequestService
 
 
     /**
-     * Creates cases from externally fetched requests.
+     * Creates request from a case.
      *
      * @param array $data          The data in the request.
      * @param array $configuration The configuration for this handler.
      *
-     * @return array The request data, updated with the cases.
+     * @return array The request data.
      */
     public function createRequestHandler(array $data, array $configuration): array
     {
         $zaak = $this->cacheService->getObject($data['body']['_id']);
 
-        if ($zaak === null || isset($zaak['zaaktype']['identificatie']) === false
-            || str_starts_with(haystack: $zaak['zaaktype']['identificatie'], needle: "vrijbrp-") === false
+        // Make sure we only do this for zaaktype starting with "vrijbrp-"
+        if ($zaak === null || isset($zaak['embedded']['zaaktype']['identificatie']) === false
+            || str_starts_with(haystack: $zaak['embedded']['zaaktype']['identificatie'], needle: "vrijbrp-") === false
         ) {
             return $data;
         }
 
+        // Get the Source and Mapping.
         $source  = $this->gatewayResourceService->getSource(reference: $configuration['source'], pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
         $mapping = $this->gatewayResourceService->getMapping(reference: $configuration['mapping'], pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
         if ($source === null || $mapping === null) {
@@ -120,18 +130,56 @@ class RequestService
 
             return $data;
         }
+        
+        //Todo: create Sync...
 
-        $body = $this->mappingService->mapping(mappingObject: $mapping, input: $zaak);
+        // Mapping, incl documents = [{file = zaakinformatieobject.informatieobject.inhoud}]
+        $requestBody = $this->mappingService->mapping(mappingObject: $mapping, input: $zaak);
 
-        foreach ($body['documents'] as $key => $document) {
-            $body['documents'][$key] = $this->createDocument(source: $source, document: $document)['contentUrl'];
+        // Handle documents (zaakinformatieobjecten) for this Case.
+        foreach ($requestBody['documents'] as $key => $document) {
+            $requestBody['documents'][$key] = $this->createDocument(source: $source, document: $document)['contentUrl'];
         }
 
-        $this->createRequest(source: $source, body: $body);
+        $this->createRequest(source: $source, body: $requestBody);
 
         return $data;
 
     }//end createRequestHandler()
+    
+    
+    /**
+     * Checks if there are Cases we need to create a Request for.
+     *
+     * @param array $data          The data in the request.
+     * @param array $configuration The configuration for this handler.
+     *
+     * @return array The request data.
+     */
+    public function checkCasesHandler(array $data, array $configuration): array
+    {
+        // Create the DateTime object for 10 minutes ago.
+        $beforeDateTime = (new DateTime())->modify(modifier: $configuration['beforeTimeModifier']);
+        
+        // Search all cases we should create Requests for.
+        $result = $this->cacheService->searchObjects(
+            filter: [
+                '_self.synchronizations' => 'IS NULL',
+                'embedded.zaaktype.identificatie' => ['like' => 'vrijbrp-'],
+                '_self.dateCreated' => ['before' => $beforeDateTime->format(format: 'Y-m-d H:i:s')]
+            ],
+            entities: ['https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json']
+        );
+        
+        // Loop through results and start creating Requests.
+        foreach ($result['results'] as $zaak) {
+            // Throw (async) event for creating a Request for this Case.
+            $event = new ActionEvent('commongateway.action.event', ['body' => $zaak], 'vrijbrp.caseToRequest.sync');
+            $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
+        }
+        
+        return $data;
+    }
 
 
 }//end class

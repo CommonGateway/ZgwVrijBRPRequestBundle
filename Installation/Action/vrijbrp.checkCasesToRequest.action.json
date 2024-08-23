@@ -1,0 +1,21 @@
+{
+  "title": "Check Cases to Request",
+  "$id": "https://example.com/action/vrijbrp.checkCasesToRequest.action.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+  "version": "0.0.1",
+  "description": "This action checks if there are Cases to create Requests for.",
+  "listens": [
+    "vrijbrp.checkCasesToRequest"
+  ],
+  "conditions":
+  {
+    "==": [
+      1,
+      1
+    ]
+  },
+  "configuration": {
+    "beforeTimeModifier": "-10 minutes"
+  },
+  "class": "CommonGateway\\ZgwVrijBRPRequestBundle\\ActionHandler\\CasesHandler"
+}

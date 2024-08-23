@@ -1,12 +1,13 @@
 {
   "title": "Create Request From Case",
-  "$id": "https://example.com/action/vrijbrp.requestToCase.action.json",
+  "$id": "https://example.com/action/vrijbrp.caseToRequest.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
   "version": "0.0.1",
-  "description": "This is an action to create requests from cases",
+  "description": "This is an action that creates a Request for a Case.",
   "listens": [
-    "??? todo ???"
+    "vrijbrp.caseToRequest.sync"
   ],
+  "async": true,
   "conditions":
   {
     "==": [
