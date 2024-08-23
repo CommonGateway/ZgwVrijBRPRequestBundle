@@ -12,17 +12,16 @@
     "preferredChannel": "https://vrijbrp.nl",
     "description": "{{ omschrijving }}",
     "status": "received",
-    "type": "{{ '/api/request_types/' ~ zaaktype.identificatie }}",
-    "customers.0.customer": "{{ 'https://vrijbrp.nl/bsn/' ~ rollen.0.betrokkeneIdentificatie.inpbsn }}",
-    "customers.0.role": "initiator",
-    "customers.0.authorizationIndication": "authorizer",
+    "type": "{{ '/api/request_types/' ~ embedded.zaaktype.identificatie }}",
+    "customers": "{% if embedded is defined and embedded.rollen is defined %}{{ map(\"https://commongateway.nl/mapping/RolToCustomer.mapping.json\", embedded.rollen, true)|json_encode }}{% else %}\"\"{% endif %}",
     "withdrawRequest": null,
     "supplementedRequest": null,
-    "body": "[{% for eigenschap in eigenschappen %}{% if loop.first == false %},{% endif %}\"{{ eigenschap.naam }}\":\"{{ eigenschap.waarde }}\"{% endfor %}]",
-    "documents": "[{% for zaakinformatieobject in zaakinformatieobjecten %}{% if loop.first == false %},{\"file\":\"zaakinformatieobject.informatieobject.inhoud\"}{% endfor %}]"
+    "body": "{% if embedded is defined and embedded.eigenschappen is defined %}[{% for eigenschap in embedded.eigenschappen %}{% if loop.first == false %},{% endif %}\"{{ eigenschap.naam }}\":\"{{ eigenschap.waarde }}\"{% endfor %}]{% else %}\"\"{% endif %}",
+    "documents": "{% if embedded is defined and embedded.zaakinformatieobjecten is defined %}[{% for zaakinformatieobject in embedded.zaakinformatieobjecten %}{% if loop.first == false %},{\"file\":\"zaakinformatieobject.informatieobject.inhoud\"}{% endfor %}]{% else %}\"\"{% endif %}"
   },
   "cast": {
-    "body": "jsonToArray",
-    "documents": "jsonToArray"
+    "customers": ["jsonToArray", "unsetIfValue=="],
+    "body": ["jsonToArray", "unsetIfValue=="],
+    "documents": ["jsonToArray", "unsetIfValue=="]
   }
 }

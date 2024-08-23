@@ -1,0 +1,13 @@
+{
+  "title": "Rol to Customer",
+  "description": "Mapping for ZGW Rol to Customer",
+  "$id": "https://commongateway.nl/mapping/RolToCustomer.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "customer": "{{ 'https://vrijbrp.nl/bsn/' ~ value.betrokkeneIdentificatie.inpbsn }}",
+    "role": "{% set translations = {'mede_initiator':'co_initiator','belanghebbende':'interested_party'} %}{{ value.roltype.omschrijvingGeneriek|replace(translations) }}",
+    "authorizationIndication": "authorizer"
+  }
+}
