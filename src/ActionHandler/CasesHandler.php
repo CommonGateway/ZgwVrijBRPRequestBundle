@@ -49,7 +49,7 @@ class CasesHandler implements ActionHandlerInterface
                     'example'     => '-10 minutes',
                     'required'    => true,
                 ],
-                'schema' => [
+                'schema'             => [
                     'type'        => 'string',
                     'description' => 'The schema for a case',
                     'example'     => 'https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json',
@@ -76,7 +76,8 @@ class CasesHandler implements ActionHandlerInterface
         return $this->requestService->checkCasesHandler($data, $configuration);
 
     }//end run()
-    
+
+
     /**
      * Set symfony style for command output during cronjob:command.
      *
@@ -87,7 +88,8 @@ class CasesHandler implements ActionHandlerInterface
     public function setStyle(SymfonyStyle $style): void
     {
         $this->requestService->setStyle($style);
-    }
+
+    }//end setStyle()
 
 
 }//end class

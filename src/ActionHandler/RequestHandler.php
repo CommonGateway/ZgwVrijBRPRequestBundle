@@ -55,7 +55,7 @@ class RequestHandler implements ActionHandlerInterface
                     'example'     => 'https://commongateway.nl/mapping/ZaakToRequest.mapping.json',
                     'required'    => true,
                 ],
-                'schema' => [
+                'schema'  => [
                     'type'        => 'string',
                     'description' => 'The schema for a case',
                     'example'     => 'https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json',
@@ -82,7 +82,8 @@ class RequestHandler implements ActionHandlerInterface
         return $this->requestService->createRequestHandler($data, $configuration);
 
     }//end run()
-    
+
+
     /**
      * Set symfony style for command output during cronjob:command.
      *
@@ -93,7 +94,8 @@ class RequestHandler implements ActionHandlerInterface
     public function setStyle(SymfonyStyle $style): void
     {
         $this->requestService->setStyle($style);
-    }
+
+    }//end setStyle()
 
 
 }//end class
