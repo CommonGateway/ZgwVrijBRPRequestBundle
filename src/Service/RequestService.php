@@ -252,8 +252,8 @@ class RequestService
 
         // Handle documents (zaakinformatieobjecten) for this Case.
         foreach ($requestBody['documents'] as $key => $document) {
-            // Todo: we could / should maybe create synchronizations for these documents as well?
-            $requestBody['documents'][$key] = $this->createDocument(source: $source, document: $document)['contentUrl'];
+            // Todo: we could create synchronizations for these documents as well
+            $requestBody['documents'][$key] = $this->createDocument(source: $source, document: $document)['@id'];
         }
 
         // Create synchronization & sync.

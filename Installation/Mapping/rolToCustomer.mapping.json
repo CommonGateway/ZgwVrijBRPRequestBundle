@@ -6,8 +6,8 @@
   "version": "0.0.1",
   "passTrough": false,
   "mapping": {
-    "customer": "{{ 'https://vrijbrp.nl/bsn/' ~ value.betrokkeneIdentificatie.inpbsn }}",
-    "role": "{% set translations = {'mede_initiator':'co_initiator','belanghebbende':'interested_party'} %}{{ value.roltype.omschrijvingGeneriek|replace(translations) }}",
+    "customer": "{{ 'https://vrijbrp.nl/bsn/' ~ betrokkeneIdentificatie.inpBsn }}",
+    "role": "{% set translations = {'mede_initiator':'co_initiator','belanghebbende':'interested_party'} %}{{ embedded.roltype.omschrijvingGeneriek|replace(translations) }}",
     "authorizationIndication": "authorizer"
   }
 }
