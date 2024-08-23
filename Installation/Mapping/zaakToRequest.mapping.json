@@ -8,7 +8,6 @@
   "mapping": {
     "source": "gravity",
     "externalId": "{{ identificatie }}",
-    "identificatie": "{{ externalId }}",
     "registeredOn": "{{ registratiedatum }}",
     "preferredChannel": "https://vrijbrp.nl",
     "description": "{{ omschrijving }}",
