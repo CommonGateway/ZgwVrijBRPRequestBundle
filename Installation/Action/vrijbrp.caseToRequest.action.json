@@ -17,7 +17,8 @@
   },
   "configuration": {
     "source": "https://vrijbrp.nl/sources/vrijbrp.requestInbox.source.json",
-    "mapping": "https://commongateway.nl/mapping/ZaakToRequest.mapping.json"
+    "mapping": "https://commongateway.nl/mapping/ZaakToRequest.mapping.json",
+    "schema": "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json"
   },
   "class": "CommonGateway\\ZgwVrijBRPRequestBundle\\ActionHandler\\RequestHandler"
 }

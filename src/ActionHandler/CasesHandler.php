@@ -4,6 +4,7 @@ namespace CommonGateway\ZgwVrijBRPRequestBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use CommonGateway\ZgwVrijBRPRequestBundle\Service\RequestService;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * A handler for checking if there are Cases we need to create a Request for.
@@ -48,6 +49,12 @@ class CasesHandler implements ActionHandlerInterface
                     'example'     => '-10 minutes',
                     'required'    => true,
                 ],
+                'schema' => [
+                    'type'        => 'string',
+                    'description' => 'The schema for a case',
+                    'example'     => 'https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json',
+                    'required'    => true,
+                ],
             ],
         ];
 
@@ -69,6 +76,18 @@ class CasesHandler implements ActionHandlerInterface
         return $this->requestService->checkCasesHandler($data, $configuration);
 
     }//end run()
+    
+    /**
+     * Set symfony style for command output during cronjob:command.
+     *
+     * @param SymfonyStyle $style Symfony style.
+     *
+     * @return void
+     */
+    public function setStyle(SymfonyStyle $style): void
+    {
+        $this->requestService->setStyle($style);
+    }
 
 
 }//end class

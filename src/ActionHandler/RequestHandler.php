@@ -4,6 +4,7 @@ namespace CommonGateway\ZgwVrijBRPRequestBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use CommonGateway\ZgwVrijBRPRequestBundle\Service\RequestService;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * A handler for mapping a ZGW case to a Request.
@@ -54,6 +55,12 @@ class RequestHandler implements ActionHandlerInterface
                     'example'     => 'https://commongateway.nl/mapping/ZaakToRequest.mapping.json',
                     'required'    => true,
                 ],
+                'schema' => [
+                    'type'        => 'string',
+                    'description' => 'The schema for a case',
+                    'example'     => 'https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json',
+                    'required'    => true,
+                ],
             ],
         ];
 
@@ -75,6 +82,18 @@ class RequestHandler implements ActionHandlerInterface
         return $this->requestService->createRequestHandler($data, $configuration);
 
     }//end run()
+    
+    /**
+     * Set symfony style for command output during cronjob:command.
+     *
+     * @param SymfonyStyle $style Symfony style.
+     *
+     * @return void
+     */
+    public function setStyle(SymfonyStyle $style): void
+    {
+        $this->requestService->setStyle($style);
+    }
 
 
 }//end class

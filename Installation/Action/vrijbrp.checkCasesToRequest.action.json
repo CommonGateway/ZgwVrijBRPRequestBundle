@@ -15,7 +15,8 @@
     ]
   },
   "configuration": {
-    "beforeTimeModifier": "-10 minutes"
+    "beforeTimeModifier": "-10 minutes",
+    "schema": "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json"
   },
   "class": "CommonGateway\\ZgwVrijBRPRequestBundle\\ActionHandler\\CasesHandler"
 }
