@@ -13,15 +13,13 @@
     "description": "{{ omschrijving }}",
     "status": "received",
     "type": "{{ '/api/request_types/' ~ embedded.zaaktype.identificatie }}",
-    "customers": "{% if embedded is defined and embedded.rollen is defined %}{{ map(\"https://commongateway.nl/mapping/RolToCustomer.mapping.json\", embedded.rollen, true)|json_encode }}{% else %}\"\"{% endif %}",
-    "withdrawRequest": null,
-    "supplementedRequest": null,
-    "body": "{% if embedded is defined and embedded.eigenschappen is defined %}[{% for eigenschap in embedded.eigenschappen %}{% if loop.first == false %},{% endif %}\"{{ eigenschap.naam }}\":\"{{ eigenschap.waarde }}\"{% endfor %}]{% else %}\"\"{% endif %}",
-    "documents": "{% if embedded is defined and embedded.zaakinformatieobjecten is defined %}[{% for zaakinformatieobject in embedded.zaakinformatieobjecten %}{% if loop.first == false %},{\"file\":\"zaakinformatieobject.informatieobject.inhoud\"}{% endfor %}]{% else %}\"\"{% endif %}"
+    "customers": "{% if embedded is defined and embedded.rollen is defined %}{{ map(\"https://commongateway.nl/mapping/RolToCustomer.mapping.json\", embedded.rollen, true)|json_encode }}{% else %}[]{% endif %}",
+    "body": "{% if embedded is defined and embedded.eigenschappen is defined %}[{% for eigenschap in embedded.eigenschappen %}{% if loop.first == false %},{% endif %}\"{{ eigenschap.naam }}\":\"{{ eigenschap.waarde }}\"{% endfor %}]{% else %}[]{% endif %}",
+    "documents": "{% if embedded is defined and embedded.zaakinformatieobjecten is defined %}[{% for zaakinformatieobject in embedded.zaakinformatieobjecten %}{% if loop.first == false %},{% endif %}{\"file\":\"zaakinformatieobject.informatieobject.inhoud\"}{% endfor %}]{% else %}[]{% endif %}"
   },
   "cast": {
-    "customers": ["jsonToArray", "unsetIfValue=="],
-    "body": ["jsonToArray", "unsetIfValue=="],
-    "documents": ["jsonToArray", "unsetIfValue=="]
+    "customers": "jsonToArray",
+    "body": "jsonToArray",
+    "documents": "jsonToArray"
   }
 }

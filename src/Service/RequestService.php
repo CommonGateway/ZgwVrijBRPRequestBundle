@@ -2,8 +2,10 @@
 
 namespace CommonGateway\ZgwVrijBRPRequestBundle\Service;
 
+use Adbar\Dot;
 use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
+use App\Entity\Synchronization;
 use App\Event\ActionEvent;
 use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CacheService;
@@ -88,12 +90,12 @@ class RequestService
 
         // Search all cases we should create Requests for.
         $result = $this->cacheService->searchObjects(
-            filter: [
+            [
                 '_self.synchronizations'          => 'IS NULL',
                 'embedded.zaaktype.identificatie' => ['like' => 'vrijbrp-'],
                 '_self.dateCreated'               => ['before' => $beforeDateTime->format(format: 'Y-m-d H:i:s')],
             ],
-            entities: [$configuration['schema']]
+            [$configuration['schema']]
         );
 
         if (isset($this->style) === true) {
@@ -224,7 +226,6 @@ class RequestService
             || str_starts_with(haystack: $data['body']['embedded']['zaaktype']['identificatie'], needle: "vrijbrp-") === false
         ) {
             $message = 'Could not find an object with id '.$data['body']['_id'].' or zaaktype identificatie does not start with "vrijbrp-"';
-            isset($this->style) === true && $this->style->error($message);
             $this->pluginLogger->error(message: $message, context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']);
             $data['response'] = new Response(\Safe\json_encode(['Message' => $message]), 500, ['Content-type' => 'application/json']);
 
@@ -237,7 +238,6 @@ class RequestService
         $schema  = $this->gatewayResourceService->getSchema(reference: $configuration['schema'], pluginName:'common-gateway/zgw-vrijbrp-request-bundle');
         if ($source === null || $mapping === null || $schema === null) {
             $message = 'Could not find a Source, Mapping or Schema for '.$configuration['source'].', '.$configuration['mapping'].' or https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json';
-            isset($this->style) === true && $this->style->error($message);
             $this->pluginLogger->error(message: $message, context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']);
             $data['response'] = new Response(\Safe\json_encode(['Message' => $message]), 500, ['Content-type' => 'application/json']);
 
@@ -245,7 +245,7 @@ class RequestService
         }
 
         // Get full body of this Case Object.
-        $zaak = $object->toArray();
+        $zaak = $object->toArray(['embedded' => true]);
 
         // Mapping, incl documents = [{file = zaakinformatieobject.informatieobject.inhoud}]
         $requestBody = $this->mappingService->mapping(mappingObject: $mapping, input: $zaak);
@@ -260,12 +260,10 @@ class RequestService
         $synchronization  = $this->syncService->findSyncByObject(objectEntity: $object, source: $source, entity: $schema);
         $response         = $this->synchronizeTemp(synchronization: $synchronization, objectArray: $requestBody, location: '/api/requests');
         $data['response'] = new Response(\Safe\json_encode($response), 200, ['Content-type' => 'application/json']);
-        ;
-
+        
         $this->entityManager->persist($synchronization);
         $this->entityManager->flush();
-
-        isset($this->style) === true && $this->style->succes('Succesfully synced case with id: '.$data['body']['_id'].' - '.$data['body']['identificatie']);
+        $this->cacheService->cacheObject(objectEntity: $synchronization->getObject());
 
         return $data;
 

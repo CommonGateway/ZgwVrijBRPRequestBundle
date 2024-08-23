@@ -84,18 +84,4 @@ class RequestHandler implements ActionHandlerInterface
     }//end run()
 
 
-    /**
-     * Set symfony style for command output during cronjob:command.
-     *
-     * @param SymfonyStyle $style Symfony style.
-     *
-     * @return void
-     */
-    public function setStyle(SymfonyStyle $style): void
-    {
-        $this->requestService->setStyle($style);
-
-    }//end setStyle()
-
-
 }//end class
