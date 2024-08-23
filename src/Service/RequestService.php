@@ -104,7 +104,7 @@ class RequestService
     public function createRequestHandler(array $data, array $configuration): array
     {
         $zaak = $this->cacheService->getObject($data['body']['_id']);
-        
+
         if ($zaak === null || isset($zaak['zaaktype']['identificatie']) === false
             || str_starts_with(haystack: $zaak['zaaktype']['identificatie'], needle: "vrijbrp-") === false
         ) {
