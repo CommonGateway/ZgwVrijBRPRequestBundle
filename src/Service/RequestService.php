@@ -115,8 +115,8 @@ class RequestService
         return $data;
 
     }//end checkCasesHandler()
-    
-    
+
+
     /**
      * Generates a filename like "file.pdf" by combining 'file' and the extension we can get from the file $binaryData.
      *
@@ -127,28 +127,29 @@ class RequestService
     private function generateFilename(string $binaryData): ?string
     {
         // Use finfo to detect the MIME type
-        $finfo = new finfo(flags: FILEINFO_MIME_TYPE);
+        $finfo    = new finfo(flags: FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer(string: $binaryData);
-        
+
         // Instantiate the MimeTypes class
         $mimeTypes = new MimeTypes();
-        
+
         // Get the file extensions associated with the MIME type
         $extensions = $mimeTypes->getExtensions(mimeType: $mimeType);
-        
+
         if (empty($extensions) === true) {
             $this->pluginLogger->error(
                 message: 'Could not Create Document. $document in createDocument() has no "filename"
-                    and could not find a file extension for MIME type: ' . $mimeType . ' in generateFilename().',
+                    and could not find a file extension for MIME type: '.$mimeType.' in generateFilename().',
                 context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']
             );
-            
+
             return null;
         }
-        
-        return 'file.' . $extensions[0];
-    }
-    
+
+        return 'file.'.$extensions[0];
+
+    }//end generateFilename()
+
 
     /**
      * Creates a document in the Source.
@@ -165,12 +166,12 @@ class RequestService
                 message: 'Could not Create Document. $document in createDocument expects a key "file".',
                 context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']
             );
-            
+
             return [];
         }
-        
+
         $document['file'] = base64_decode(string: $document['file']);
-        
+
         if (empty($document['filename']) === true) {
             $document['filename'] = $this->generateFilename(binaryData: $document['file']);
             if (empty($document['filename']) === null) {
@@ -186,10 +187,10 @@ class RequestService
                 config: [
                     'multipart' => [
                         [
-                            'name'      => 'file',
-                            'contents'  => $document['file'],
-                            'filename'  => $document['filename']
-                        ]
+                            'name'     => 'file',
+                            'contents' => $document['file'],
+                            'filename' => $document['filename'],
+                        ],
                     ],
                 ]
             );
@@ -197,7 +198,7 @@ class RequestService
             if (method_exists(object_or_class: get_class(object: $exception), method: 'getResponse') === true && $exception->getResponse() !== null) {
                 $responseBody = $exception->getResponse()->getBody();
             }
-            
+
             $this->pluginLogger->error(
                 message: 'Could not Create Document. Error message: '.$exception->getMessage().'\nFull Response: '.($responseBody ?? ''),
                 context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']
