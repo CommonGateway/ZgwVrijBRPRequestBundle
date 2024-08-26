@@ -128,16 +128,29 @@ class RequestService
         if (isset($document['file']) === true) {
             $document['file'] = base64_decode($document['file']);
         }
-
-        $response = $this->callService->call(
-            source: $source,
-            endpoint: '/api/documents',
-            method: 'POST',
-            config: [
-                'body'    => json_encode($document),
-                'headers' => ['Accept' => 'multipart/form-data'],
-            ]
-        );
+        
+        try {
+            $response = $this->callService->call(
+                source: $source,
+                endpoint: '/api/documents',
+                method: 'POST',
+                config: [
+                    'body'    => json_encode($document),
+                    'headers' => ['Accept' => 'multipart/form-data'],
+                ]
+            );
+        } catch (Exception | GuzzleException $exception) {
+            if (method_exists(get_class($exception), 'getResponse') === true && $exception->getResponse() !== null) {
+                $responseBody = $exception->getResponse()->getBody();
+            }
+            
+            $this->pluginLogger->error(
+                message: 'Could not synchronize object. Error message: '.$exception->getMessage().'\nFull Response: '.($responseBody ?? ''),
+                context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']
+            );
+            
+            return [];
+        }
 
         return $this->callService->decodeResponse(source: $source, response: $response);
 
