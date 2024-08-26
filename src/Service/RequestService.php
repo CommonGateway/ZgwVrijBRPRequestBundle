@@ -128,7 +128,7 @@ class RequestService
         if (isset($document['file']) === true) {
             $document['file'] = base64_decode($document['file']);
         }
-        
+
         try {
             $response = $this->callService->call(
                 source: $source,
@@ -143,14 +143,14 @@ class RequestService
             if (method_exists(get_class($exception), 'getResponse') === true && $exception->getResponse() !== null) {
                 $responseBody = $exception->getResponse()->getBody();
             }
-            
+
             $this->pluginLogger->error(
                 message: 'Could not synchronize object. Error message: '.$exception->getMessage().'\nFull Response: '.($responseBody ?? ''),
                 context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']
             );
-            
+
             return [];
-        }
+        }//end try
 
         return $this->callService->decodeResponse(source: $source, response: $response);
 
