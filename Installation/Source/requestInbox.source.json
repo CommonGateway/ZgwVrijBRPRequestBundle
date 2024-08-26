@@ -3,7 +3,7 @@
   "description": "VrijBRP Request Inbox",
   "$id": "https://vrijbrp.nl/sources/vrijbrp.requestInbox.source.json",
   "$schema": "https://docs.commongateway.nl/schemas/Gateway.schema.json",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "location": "https://request-inbox.vrijbrp.nl",
   "isEnabled": true,
   "type": "json",
@@ -31,5 +31,8 @@
   },
   "configuration": {
     "verify": true
+  },
+  "headers": {
+    "Content-Type": "application/json"
   }
 }

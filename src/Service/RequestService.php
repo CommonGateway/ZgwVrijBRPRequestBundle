@@ -14,10 +14,12 @@ use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use finfo;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\MimeTypes;
 
 /**
  * A service for mapping requests to ZGW cases.
@@ -113,7 +115,40 @@ class RequestService
         return $data;
 
     }//end checkCasesHandler()
-
+    
+    
+    /**
+     * Generates a filename like "file.pdf" by combining 'file' and the extension we can get from the file $binaryData.
+     *
+     * @param string $binaryData The binary data of a file, to get the mime type from, and with that the extension.
+     *
+     * @return string|null A file name or null.
+     */
+    private function generateFilename(string $binaryData): ?string
+    {
+        // Use finfo to detect the MIME type
+        $finfo = new finfo(flags: FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer(string: $binaryData);
+        
+        // Instantiate the MimeTypes class
+        $mimeTypes = new MimeTypes();
+        
+        // Get the file extensions associated with the MIME type
+        $extensions = $mimeTypes->getExtensions(mimeType: $mimeType);
+        
+        if (empty($extensions) === true) {
+            $this->pluginLogger->error(
+                message: 'Could not Create Document. $document in createDocument() has no "filename"
+                    and could not find a file extension for MIME type: ' . $mimeType . ' in generateFilename().',
+                context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']
+            );
+            
+            return null;
+        }
+        
+        return 'file.' . $extensions[0];
+    }
+    
 
     /**
      * Creates a document in the Source.
@@ -125,8 +160,22 @@ class RequestService
      */
     private function createDocument(Source $source, array $document): array
     {
-        if (isset($document['file']) === true) {
-            $document['file'] = base64_decode($document['file']);
+        if (isset($document['file']) === false) {
+            $this->pluginLogger->error(
+                message: 'Could not Create Document. $document in createDocument expects a key "file".',
+                context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']
+            );
+            
+            return [];
+        }
+        
+        $document['file'] = base64_decode(string: $document['file']);
+        
+        if (empty($document['filename']) === true) {
+            $document['filename'] = $this->generateFilename(binaryData: $document['file']);
+            if (empty($document['filename']) === null) {
+                return [];
+            }
         }
 
         try {
@@ -135,17 +184,22 @@ class RequestService
                 endpoint: '/api/documents',
                 method: 'POST',
                 config: [
-                    'body'    => json_encode($document),
-                    'headers' => ['Accept' => 'multipart/form-data'],
+                    'multipart' => [
+                        [
+                            'name'      => 'file',
+                            'contents'  => $document['file'],
+                            'filename'  => $document['filename']
+                        ]
+                    ],
                 ]
             );
         } catch (Exception | GuzzleException $exception) {
-            if (method_exists(get_class($exception), 'getResponse') === true && $exception->getResponse() !== null) {
+            if (method_exists(object_or_class: get_class(object: $exception), method: 'getResponse') === true && $exception->getResponse() !== null) {
                 $responseBody = $exception->getResponse()->getBody();
             }
-
+            
             $this->pluginLogger->error(
-                message: 'Could not synchronize object. Error message: '.$exception->getMessage().'\nFull Response: '.($responseBody ?? ''),
+                message: 'Could not Create Document. Error message: '.$exception->getMessage().'\nFull Response: '.($responseBody ?? ''),
                 context: ['plugin' => 'common-gateway/zgw-vrijbrp-request-bundle']
             );
 
@@ -183,7 +237,6 @@ class RequestService
                 'POST',
                 [
                     'body'    => $objectString,
-                    // 'query'   => [],
                     'headers' => $synchronization->getSource()->getHeaders(),
                 ]
             );

@@ -15,7 +15,7 @@
     "type": "{{ '/api/request_types/' ~ embedded.zaaktype.identificatie }}",
     "customers": "{% if embedded is defined and embedded.rollen is defined %}{{ map(\"https://commongateway.nl/mapping/RolToCustomer.mapping.json\", embedded.rollen, true)|json_encode }}{% else %}[]{% endif %}",
     "body": "{% if embedded is defined and embedded.eigenschappen is defined %}{% set array = {} %}{% for eigenschap in embedded.eigenschappen %}{% set array = array|merge({(eigenschap.embedded.eigenschap.naam): eigenschap.waarde}) %}{% endfor %}{{ array|json_encode }}{% else %}[]{% endif %}",
-    "documents": "{% if embedded is defined and embedded.zaakinformatieobjecten is defined %}{% set array = [] %}{% for zaakinformatieobject in embedded.zaakinformatieobjecten %}{% set array = array|merge([{'file': zaakinformatieobject.embedded.informatieobject.inhoud}]) %}{% endfor %}{{ array|json_encode }}{% else %}[]{% endif %}"
+    "documents": "{% if embedded is defined and embedded.zaakinformatieobjecten is defined %}{% set array = [] %}{% for zaakinformatieobject in embedded.zaakinformatieobjecten %}{% set array = array|merge([{'file': zaakinformatieobject.embedded.informatieobject.inhoud, 'filename': zaakinformatieobject.embedded.informatieobject.bestandsnaam}]) %}{% endfor %}{{ array|json_encode }}{% else %}[]{% endif %}"
   },
   "cast": {
     "customers": "jsonToArray",
