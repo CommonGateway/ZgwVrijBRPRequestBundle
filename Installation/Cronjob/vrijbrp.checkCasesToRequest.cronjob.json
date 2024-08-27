@@ -1,0 +1,11 @@
+{
+    "title": "Check Cases to Request",
+    "$id": "https://example.com/cronjob/vrijbrp.checkCasesToRequest.cronjob.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Cronjob.schema.json",
+    "version": "0.0.1",
+    "description": "This cronjob triggers the action that checks if there are Cases to create Requests for every 10 minutes",
+    "crontab": "*/10 * * * *",
+    "throws": [
+        "vrijbrp.checkCasesToRequest"
+    ]
+}

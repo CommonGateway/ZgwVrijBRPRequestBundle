@@ -50,7 +50,7 @@ class ZaakTypeService
      * @param  array $base   The base object to flatten.
      * @return array
      */
-    public function flattenJsonSchema(array $object, array $base=[])
+    public function flattenJsonSchema(array $object, array $base=[]): array
     {
         if ($base === []) {
             $base = $object;
@@ -84,7 +84,7 @@ class ZaakTypeService
     /**
      * Fetch request types from the source.
      *
-     * @param string $source The source to request.
+     * @param string $sourceReference The source to request.
      *
      * @return array The resulting request types.
      */
