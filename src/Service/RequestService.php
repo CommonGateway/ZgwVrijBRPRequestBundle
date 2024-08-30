@@ -111,12 +111,11 @@ class RequestService
             $event = new ActionEvent('commongateway.action.event', ['body' => $zaak], 'vrijbrp.caseToRequest.sync');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
         }
-        
+
         // Todo: Check / get cases for zaaktype identificatie in ['B0328', 'B0255', 'B0348', 'B1425', 'B0237', 'B0337', 'B0360', 'B0366']
         // (first 4 are from NaamgebruikVrijBRPBundle, last 4 are from GeboorteVrijBRPBundle)
         // Todo: FirstRegistration might work differently? documents.0.zaak.zaaktype.identificatie in ['B333', 'B334']
         // Todo: throw event for "vrijbrp.zaak.created" for other 9 e-diensten.
-
         return $data;
 
     }//end checkCasesHandler()
