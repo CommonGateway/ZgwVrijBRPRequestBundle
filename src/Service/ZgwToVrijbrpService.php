@@ -2,23 +2,12 @@
 
 namespace CommonGateway\ZgwVrijBRPRequestBundle\Service;
 
-use Adbar\Dot;
-use App\Entity\Gateway as Source;
-use App\Entity\ObjectEntity;
-use App\Entity\Synchronization;
 use App\Event\ActionEvent;
-use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CacheService;
-use CommonGateway\CoreBundle\Service\CallService;
-use CommonGateway\CoreBundle\Service\GatewayResourceService;
-use CommonGateway\CoreBundle\Service\MappingService;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\MimeTypes;
 
 /**
  * A service for triggering actions that create api requests to VrijBRP for ZGW cases with specific 'e-dienst' case types.
@@ -78,16 +67,19 @@ class ZgwToVrijbrpService
     {
         // Create the DateTime object for 10 minutes ago.
         $beforeDateTime = (new DateTime())->modify(modifier: $configuration['beforeTimeModifier']);
-
-        // Todo: Focus on 'Naamgebruik', = 'B0348'
-        // Todo: Check / get cases for zaaktype identificatie in ['B0328', 'B0255', 'B0348', 'B1425', 'B0237', 'B0337', 'B0360', 'B0366']
-        // (first 4 are from NaamgebruikVrijBRPBundle, last 4 are from GeboorteVrijBRPBundle)
-        // Todo: FirstRegistration might work differently? documents.0.zaak.zaaktype.identificatie in ['B333', 'B334']
+        
+        /**
+         * Todo: Focus on 'Naamgebruik', = 'B0348'
+         * Todo: Check / get cases for zaaktype identificatie in ['B0328', 'B0255', 'B0348', 'B1425', 'B0237', 'B0337', 'B0360', 'B0366']
+         * (first 4 are from NaamgebruikVrijBRPBundle, last 4 are from GeboorteVrijBRPBundle)
+         * Todo: FirstRegistration might work differently? documents.0.zaak.zaaktype.identificatie in ['B333', 'B334']
+         */
+        
         // Search all cases we should create Requests for.
         $result = $this->cacheService->searchObjects(
             [
                 '_self.synchronizations'          => 'IS NULL',
-                'embedded.zaaktype.identificatie' => ['like' => 'vrijbrp-'],
+                'embedded.zaaktype.identificatie' => 'B0348', // in ['B0328', 'B0255', 'B0348', 'B1425', 'B0237', 'B0337', 'B0360', 'B0366']
                 '_self.dateCreated'               => ['before' => $beforeDateTime->format(format: 'Y-m-d H:i:s')],
             ],
             [$configuration['schema']]
@@ -100,7 +92,11 @@ class ZgwToVrijbrpService
 
         // Loop through results and start creating Requests.
         foreach ($result['results'] as $zaak) {
-            // Todo: throw event for "vrijbrp.zaak.created" for other 9 e-diensten. With ['object' => $zaak]
+            /**
+             * Todo: throw event for "vrijbrp.zaak.created" for other 9 e-diensten. With ['object' => $zaak]
+             * Are we sure a sync object is created after throwing this event?
+             */
+            
             // Throw (async) event for creating a Request for this Case.
             $event = new ActionEvent('commongateway.action.event', ['body' => $zaak], 'vrijbrp.caseToRequest.sync');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
