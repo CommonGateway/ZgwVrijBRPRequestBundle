@@ -39,9 +39,9 @@ class ZgwToVrijbrpService
 
 
     /**
-     * @param LoggerInterface          $pluginLogger           The logger interface.
-     * @param CacheService             $cacheService           The cache service.
-     * @param EventDispatcherInterface $eventDispatcher        The event dispatcher.
+     * @param LoggerInterface          $pluginLogger    The logger interface.
+     * @param CacheService             $cacheService    The cache service.
+     * @param EventDispatcherInterface $eventDispatcher The event dispatcher.
      */
     public function __construct(
         private readonly LoggerInterface $pluginLogger,
@@ -78,12 +78,11 @@ class ZgwToVrijbrpService
     {
         // Create the DateTime object for 10 minutes ago.
         $beforeDateTime = (new DateTime())->modify(modifier: $configuration['beforeTimeModifier']);
-        
+
         // Todo: Focus on 'Naamgebruik', = 'B0348'
         // Todo: Check / get cases for zaaktype identificatie in ['B0328', 'B0255', 'B0348', 'B1425', 'B0237', 'B0337', 'B0360', 'B0366']
         // (first 4 are from NaamgebruikVrijBRPBundle, last 4 are from GeboorteVrijBRPBundle)
         // Todo: FirstRegistration might work differently? documents.0.zaak.zaaktype.identificatie in ['B333', 'B334']
-        
         // Search all cases we should create Requests for.
         $result = $this->cacheService->searchObjects(
             [
@@ -101,9 +100,7 @@ class ZgwToVrijbrpService
 
         // Loop through results and start creating Requests.
         foreach ($result['results'] as $zaak) {
-            
             // Todo: throw event for "vrijbrp.zaak.created" for other 9 e-diensten. With ['object' => $zaak]
-            
             // Throw (async) event for creating a Request for this Case.
             $event = new ActionEvent('commongateway.action.event', ['body' => $zaak], 'vrijbrp.caseToRequest.sync');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
