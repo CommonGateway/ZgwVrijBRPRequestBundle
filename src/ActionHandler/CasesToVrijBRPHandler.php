@@ -43,7 +43,7 @@ class CasesToVrijBRPHandler implements ActionHandlerInterface
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
             'properties'  => [
-                'caseTypes' => [
+                'caseTypes'          => [
                     'type'        => 'string',
                     'description' => 'A string containing all case types to check for, seperated by a comma (without a space). (first 4 in example are from NaamgebruikVrijBRPBundle, last 4 are from GeboorteVrijBRPBundle)',
                     'example'     => 'B0328,B0255,B0348,B1425,B0237,B0337,B0360,B0366',

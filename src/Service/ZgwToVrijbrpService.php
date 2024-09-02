@@ -32,7 +32,7 @@ class ZgwToVrijbrpService
      * @param LoggerInterface          $pluginLogger    The logger interface.
      * @param CacheService             $cacheService    The cache service.
      * @param EventDispatcherInterface $eventDispatcher The event dispatcher.
-     * @param EntityManagerInterface $entityManager The Entity Manager.
+     * @param EntityManagerInterface   $entityManager   The Entity Manager.
      */
     public function __construct(
         private readonly LoggerInterface $pluginLogger,
@@ -74,7 +74,7 @@ class ZgwToVrijbrpService
         /*
          * Todo: FirstRegistration might work differently? documents.0.zaak.zaaktype.identificatie in ['B333', 'B334']
          */
-        
+
         // Get caseTypes to search for. (string configuration fields are still configurable in the Gateway UI, array not).
         $caseTypes = explode(separator: ',', string: $configuration['caseTypes']);
 
@@ -97,9 +97,9 @@ class ZgwToVrijbrpService
         foreach ($result['results'] as $zaak) {
             // Let's make sure we send the data of this object with the thrown event in the exact same way we did before
             // without embedded for example (in other Bundles like ZdsToZGWBundle)
-            $object = $this->entityManager->getRepository('App:ObjectEntity')->find($zaak['_id']);
+            $object         = $this->entityManager->getRepository('App:ObjectEntity')->find($zaak['_id']);
             $data['object'] = $object->toArray();
-            
+
             // Throw (async) event for mapping and sending information to VrijBRP.
             $event = new ActionEvent('commongateway.action.event', $data, 'vrijbrp.zaak.created');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
@@ -107,7 +107,7 @@ class ZgwToVrijbrpService
 
         return $data;
 
-    }//end checkCasesHandler()
+    }//end checkCasesToVrijBRPHandler()
 
 
 }//end class
