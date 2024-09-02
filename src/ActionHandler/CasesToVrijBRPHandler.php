@@ -3,27 +3,27 @@
 namespace CommonGateway\ZgwVrijBRPRequestBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use CommonGateway\ZgwVrijBRPRequestBundle\Service\RequestService;
+use CommonGateway\ZgwVrijBRPRequestBundle\Service\ZgwToVrijbrpService;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * A handler for checking if there are Cases we need to create a Request for in the requestInbox API.
+ * A handler for checking if there are Cases we need to send an API Request for to VrijBRP.
  *
  * @author Wilco Louwerse <wilco@conduction.nl>
  *
  * @license EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  */
-class CasesHandler implements ActionHandlerInterface
+class CasesToVrijBRPHandler implements ActionHandlerInterface
 {
 
 
     /**
      * The constructor
      *
-     * @param RequestService $requestService The request service
+     * @param ZgwToVrijbrpService $zgwToVrijbrpService The ZGW to VrijRBP service.
      */
     public function __construct(
-        private readonly RequestService $requestService
+        private readonly ZgwToVrijbrpService $zgwToVrijbrpService
     ) {
 
     }//end __construct()
@@ -43,6 +43,12 @@ class CasesHandler implements ActionHandlerInterface
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
             'properties'  => [
+                'caseTypes' => [
+                    'type'        => 'string',
+                    'description' => 'A string containing all case types to check for, seperated by a comma (without a space). (first 4 in example are from NaamgebruikVrijBRPBundle, last 4 are from GeboorteVrijBRPBundle)',
+                    'example'     => 'B0328,B0255,B0348,B1425,B0237,B0337,B0360,B0366',
+                    'required'    => true,
+                ],
                 'beforeTimeModifier' => [
                     'type'        => 'string',
                     'description' => 'The string passed to new DateTime())->modify() that is used as filter on _self.dateCreated when searching for cases.',
@@ -73,7 +79,7 @@ class CasesHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->requestService->checkCasesHandler($data, $configuration);
+        return $this->zgwToVrijbrpService->checkCasesToVrijBRPHandler($data, $configuration);
 
     }//end run()
 
@@ -87,7 +93,7 @@ class CasesHandler implements ActionHandlerInterface
      */
     public function setStyle(SymfonyStyle $style): void
     {
-        $this->requestService->setStyle($style);
+        $this->zgwToVrijbrpService->setStyle($style);
 
     }//end setStyle()
 

@@ -2,8 +2,8 @@
   "title": "Synchronise Request Types",
   "$id": "https://example.com/action/vrijbrp.syncRequestTypes.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.1",
-  "description": "This is an action to synchronize request types from VrijBRP",
+  "version": "0.0.2",
+  "description": "This is an action to synchronize request types from VrijBRP requestInbox API",
   "listens": [
     "vrijbrp.requesttypes.sync"
   ],

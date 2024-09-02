@@ -78,7 +78,7 @@ class RequestService
 
 
     /**
-     * Checks if there are Cases we need to create a Request for.
+     * Checks if there are Cases we need to create a Request for in the requestInbox API.
      *
      * @param array $data          The data in the request.
      * @param array $configuration The configuration for this handler.
@@ -90,7 +90,7 @@ class RequestService
         // Create the DateTime object for 10 minutes ago.
         $beforeDateTime = (new DateTime())->modify(modifier: $configuration['beforeTimeModifier']);
 
-        // Search all cases we should create Requests for.
+        // Search all cases we should create Requests for in the requestInbox API.
         $result = $this->cacheService->searchObjects(
             [
                 '_self.synchronizations'          => 'IS NULL',
@@ -102,12 +102,12 @@ class RequestService
 
         if (isset($this->style) === true) {
             $this->style->section('checkCasesHandler');
-            $this->style->writeln('Found '.count($result['results']).' Cases to create Requests for.');
+            $this->style->writeln('Found '.count($result['results']).' Cases to create Requests for in the requestInbox API.');
         }
 
         // Loop through results and start creating Requests.
         foreach ($result['results'] as $zaak) {
-            // Throw (async) event for creating a Request for this Case.
+            // Throw (async) event for creating a Request for this Case in the requestInbox API.
             $event = new ActionEvent('commongateway.action.event', ['body' => $zaak], 'vrijbrp.caseToRequest.sync');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
         }
