@@ -17,7 +17,8 @@
     "require": {
         "php": ">=8.2",
         "commongateway/corebundle": "^1.3 | <2.0",
-        "common-gateway/zgw-bundle": "^1.2",
+        "common-gateway/naamgebruik-vrijbrp-bundle": "^0.0.53",
+        "common-gateway/geboorte-vrijbrp-bundle": "^0.0.85",
         "ext-fileinfo": "*",
         "symfony/mime": "*"
     },

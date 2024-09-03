@@ -1,11 +1,11 @@
 {
-  "title": "Check Cases to Request",
+  "title": "Check Cases to VrijBRP",
   "$id": "https://example.com/action/vrijbrp.checkCasesToRequest.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.2",
-  "description": "This action checks if there are Cases to create Requests for in the requestInbox API.",
+  "version": "0.0.1",
+  "description": "This action checks if there are Cases to send API Requests for to VrijBRP.",
   "listens": [
-    "vrijbrp.checkCasesToRequest"
+    "vrijbrp.checkCasesToVrijBRP"
   ],
   "conditions":
   {
@@ -15,8 +15,9 @@
     ]
   },
   "configuration": {
+    "caseTypes":  "B0328,B0255,B0348,B1425,B0237,B0337,B0360,B0366",
     "beforeTimeModifier": "-10 minutes",
     "schema": "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json"
   },
-  "class": "CommonGateway\\ZgwVrijBRPRequestBundle\\ActionHandler\\CasesHandler"
+  "class": "CommonGateway\\ZgwVrijBRPRequestBundle\\ActionHandler\\CasesToVrijBRPHandler"
 }

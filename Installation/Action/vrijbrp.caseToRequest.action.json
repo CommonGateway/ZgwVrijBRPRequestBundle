@@ -2,8 +2,8 @@
   "title": "Create Request From Case",
   "$id": "https://example.com/action/vrijbrp.caseToRequest.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.1",
-  "description": "This is an action that creates a Request for a Case.",
+  "version": "0.0.2",
+  "description": "This is an action that creates a Request for a Case in the requestInbox API.",
   "listens": [
     "vrijbrp.caseToRequest.sync"
   ],
