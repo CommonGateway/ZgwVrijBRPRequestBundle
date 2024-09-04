@@ -1,6 +1,6 @@
 {
   "title": "Check Cases to VrijBRP",
-  "$id": "https://example.com/action/vrijbrp.checkCasesToRequest.action.json",
+  "$id": "https://example.com/action/vrijbrp.checkCasesToVrijBRP.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
   "version": "0.0.1",
   "description": "This action checks if there are Cases to send API Requests for to VrijBRP.",
