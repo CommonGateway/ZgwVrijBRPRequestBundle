@@ -96,7 +96,7 @@ class ZgwToVrijbrpService
         // Loop through results and start throwing events that will send api requests to VrijBRP.
         foreach ($result['results'] as $zaak) {
             $this->style->writeln('Handling case with id: '.$zaak['_id'].' & case type: '.$zaak['embedded']['zaaktype']['identificatie']);
-            
+
             // Let's make sure we send the data of this object with the thrown event in the exact same way we did before
             // without embedded for example (in other Bundles like ZdsToZGWBundle)
             $object         = $this->entityManager->getRepository('App:ObjectEntity')->find($zaak['_id']);
