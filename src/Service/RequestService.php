@@ -270,6 +270,10 @@ class RequestService
         $synchronization->setSourceLastChanged($now);
         $synchronization->setLastChecked($now);
         $synchronization->setHash(hash('sha384', serialize($bodyDot->jsonSerialize())));
+        
+        $this->entityManager->persist($synchronization);
+        $this->entityManager->flush();
+        $this->cacheService->cacheObject(objectEntity: $synchronization->getObject());
 
         return $body;
 
@@ -327,10 +331,6 @@ class RequestService
         $synchronization  = $this->syncService->findSyncByObject(objectEntity: $object, source: $source, entity: $schema);
         $response         = $this->synchronizeTemp(synchronization: $synchronization, objectArray: $requestBody, location: '/api/requests');
         $data['response'] = new Response(\Safe\json_encode($response), 200, ['Content-type' => 'application/json']);
-
-        $this->entityManager->persist($synchronization);
-        $this->entityManager->flush();
-        $this->cacheService->cacheObject(objectEntity: $synchronization->getObject());
 
         return $data;
 
