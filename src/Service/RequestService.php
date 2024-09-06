@@ -270,7 +270,7 @@ class RequestService
         $synchronization->setSourceLastChanged($now);
         $synchronization->setLastChecked($now);
         $synchronization->setHash(hash('sha384', serialize($bodyDot->jsonSerialize())));
-        
+
         $this->entityManager->persist($synchronization);
         $this->entityManager->flush();
         $this->cacheService->cacheObject(objectEntity: $synchronization->getObject());
