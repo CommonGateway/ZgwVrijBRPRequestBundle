@@ -107,24 +107,24 @@ class ZgwToVrijbrpService
             // Throw (async) event for mapping and sending information to VrijBRP soap API.
             $event = new ActionEvent('commongateway.action.event', $data, 'vrijbrp.zaak.created');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-            
+
             if (empty($zaak['embedded']['zaakinformatieobjecten']) === false) {
                 foreach ($zaak['embedded']['zaakinformatieobjecten'] as $zaakInformatieObject) {
                     if (isset($this->style) === true) {
                         $this->style->writeln('Handling document '.$zaakInformatieObject['titel'].' for case with id: '.$zaak['_id'].' & case type: '.$zaak['embedded']['zaaktype']['identificatie']);
                     }
-                    
+
                     // Let's make sure we send the data of this object with the thrown event in the exact same way we did before
                     // without embedded for example (in other Bundles like ZdsToZGWBundle)
                     $object              = $this->entityManager->getRepository('App:ObjectEntity')->find($zaakInformatieObject['_id']);
                     $data['documents'][] = $object->toArray();
                 }
-                
+
                 // Throw (async) event for mapping and sending information to VrijBRP Dossier API.
                 $event = new ActionEvent('commongateway.action.event', $data, 'vrijbrp.document.created');
                 $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
             }
-        }
+        }//end foreach
 
         return $data;
 
