@@ -111,12 +111,12 @@ class ZgwToVrijbrpService
             if (empty($zaak['embedded']['zaakinformatieobjecten']) === false) {
                 foreach ($zaak['embedded']['zaakinformatieobjecten'] as $zaakInformatieObject) {
                     if (isset($this->style) === true) {
-                        $this->style->writeln('Handling document '.$zaakInformatieObject['titel'].' for case with id: '.$zaak['_id'].' & case type: '.$zaak['embedded']['zaaktype']['identificatie']);
+                        $this->style->writeln('Handling document '. ($zaakInformatieObject['embedded']['informatieobject']['bestandsnaam'] ?? $zaakInformatieObject['titel']) .' for case with id: '.$zaak['_id'].' & case type: '.$zaak['embedded']['zaaktype']['identificatie']);
                     }
 
                     // Let's make sure we send the data of this object with the thrown event in the exact same way we did before
                     // without embedded for example (in other Bundles like ZdsToZGWBundle)
-                    $object              = $this->entityManager->getRepository('App:ObjectEntity')->find($zaakInformatieObject['_id']);
+                    $object              = $this->entityManager->getRepository('App:ObjectEntity')->find($zaakInformatieObject['_self']['id']);
                     $data['documents'][] = $object->toArray();
                 }
 
