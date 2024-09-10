@@ -111,7 +111,7 @@ class ZgwToVrijbrpService
             if (empty($zaak['embedded']['zaakinformatieobjecten']) === false) {
                 foreach ($zaak['embedded']['zaakinformatieobjecten'] as $zaakInformatieObject) {
                     if (isset($this->style) === true) {
-                        $this->style->writeln('Handling document '. ($zaakInformatieObject['embedded']['informatieobject']['bestandsnaam'] ?? $zaakInformatieObject['titel']) .' for case with id: '.$zaak['_id'].' & case type: '.$zaak['embedded']['zaaktype']['identificatie']);
+                        $this->style->writeln('Handling document '.($zaakInformatieObject['embedded']['informatieobject']['bestandsnaam'] ?? $zaakInformatieObject['titel']).' for case with id: '.$zaak['_id'].' & case type: '.$zaak['embedded']['zaaktype']['identificatie']);
                     }
 
                     // Let's make sure we send the data of this object with the thrown event in the exact same way we did before
