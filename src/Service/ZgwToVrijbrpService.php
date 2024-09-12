@@ -142,7 +142,7 @@ class ZgwToVrijbrpService
             if ($zaak instanceof BSONDocument) {
                 $zaak = $zaak->toArray();
             }
-            
+
             $this->handleCase($zaak);
         }//end foreach
 
