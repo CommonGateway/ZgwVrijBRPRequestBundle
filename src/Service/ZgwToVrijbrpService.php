@@ -109,15 +109,15 @@ class ZgwToVrijbrpService
      *
      * @return array|mixed
      */
-    function bsonToArray(mixed $bson): mixed
+    public function bsonToArray(mixed $bson): mixed
     {
         if ($bson instanceof BSONDocument || $bson instanceof BSONArray) {
-            return array_map('bsonToArray', (array) $bson);
+            // Use [$this, 'bsonToArray'] to refer to the class method in array_map
+            return array_map([$this, 'bsonToArray'], (array) $bson);
         }
-
+        
         return $bson;
-
-    }//end bsonToArray()
+    }
 
 
     /**
