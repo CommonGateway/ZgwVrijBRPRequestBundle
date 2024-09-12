@@ -100,6 +100,22 @@ class ZgwToVrijbrpService
         }
 
     }//end handleCase()
+    
+    
+    /**
+     * Function to recursively convert BSONDocument/BSONArray to PHP array
+     *
+     * @param mixed $bson BsonDocument or array
+     *
+     * @return array|mixed
+     */
+    function bsonToArray(mixed $bson): mixed
+    {
+        if ($bson instanceof BSONDocument || $bson instanceof BSONArray) {
+            return array_map('bsonToArray', (array) $bson);
+        }
+        return $bson;
+    }
 
 
     /**
@@ -140,7 +156,7 @@ class ZgwToVrijbrpService
         // Loop through results and start throwing events that will send api requests to VrijBRP.
         foreach ($result['results'] as $zaak) {
             if ($zaak instanceof BSONDocument) {
-                $zaak = $zaak->toArray();
+                $zaak = $this->bsonToArray($zaak);
             }
 
             $this->handleCase($zaak);
