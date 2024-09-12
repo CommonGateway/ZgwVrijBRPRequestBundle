@@ -100,8 +100,8 @@ class ZgwToVrijbrpService
         }
 
     }//end handleCase()
-    
-    
+
+
     /**
      * Function to recursively convert BSONDocument/BSONArray to PHP array
      *
@@ -114,8 +114,10 @@ class ZgwToVrijbrpService
         if ($bson instanceof BSONDocument || $bson instanceof BSONArray) {
             return array_map('bsonToArray', (array) $bson);
         }
+
         return $bson;
-    }
+
+    }//end bsonToArray()
 
 
     /**
