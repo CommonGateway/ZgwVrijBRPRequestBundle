@@ -115,9 +115,10 @@ class ZgwToVrijbrpService
             // Use [$this, 'bsonToArray'] to refer to the class method in array_map
             return array_map([$this, 'bsonToArray'], (array) $bson);
         }
-        
+
         return $bson;
-    }
+
+    }//end bsonToArray()
 
 
     /**
