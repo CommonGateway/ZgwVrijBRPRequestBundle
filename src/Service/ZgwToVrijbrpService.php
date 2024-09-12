@@ -6,6 +6,7 @@ use App\Event\ActionEvent;
 use CommonGateway\CoreBundle\Service\CacheService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use MongoDB\Model\BSONDocument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -138,6 +139,10 @@ class ZgwToVrijbrpService
 
         // Loop through results and start throwing events that will send api requests to VrijBRP.
         foreach ($result['results'] as $zaak) {
+            if ($zaak instanceof BSONDocument) {
+                $zaak = $zaak->toArray();
+            }
+            
             $this->handleCase($zaak);
         }//end foreach
 
