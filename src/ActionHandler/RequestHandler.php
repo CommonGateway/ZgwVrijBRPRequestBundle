@@ -39,8 +39,8 @@ class RequestHandler implements ActionHandlerInterface
         return [
             '$id'         => 'https://example.com/ActionHandler/PetStoreHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'       => 'PetStore ActionHandler',
-            'description' => 'This handler returns a welcoming string',
+            'title'       => 'Create Request From Case ActionHandler',
+            'description' => 'Creates request from a case.',
             'required'    => [],
             'properties'  => [
                 'source'  => [
