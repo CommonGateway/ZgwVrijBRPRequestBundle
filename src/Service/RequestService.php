@@ -318,6 +318,8 @@ class RequestService
         // Get full body of this Case Object.
         $zaak = $object->toArray(['embedded' => true]);
 
+        $zaak = $this->getDocumentContents($zaak, $object);
+
         // Mapping, incl documents = [{file = zaakinformatieobject.informatieobject.inhoud}]
         $requestBody = $this->mappingService->mapping(mappingObject: $mapping, input: $zaak);
 
@@ -335,6 +337,30 @@ class RequestService
         return $data;
 
     }//end createRequestHandler()
+
+    private function getDocumentContents(array $array, ObjectEntity $object): array
+    {
+        if (isset($array['embedded']) === false || isset($array['embedded']['zaakinformatieobjecten']) === false) {
+            return $array;
+        }
+        $zios = $object->getValueObject('zaakinformatieobjecten')->getObjects();
+
+        foreach ($zios as $zio) {
+            $eio = $zio->getValueObject('informatieobject')->getObjects()[0];
+
+            $contents = [$zio->getId()->toString() => $eio->getValueObject('inhoud')->getFiles()->first()->getBase64()];
+
+        }
+
+        $array['embedded']['zaakinformatieobjecten'] = array_map(
+            function(array $zio) use ($contents) {
+                $zio['embedded']['informatieobject']['inhoud'] = $contents[$zio['id']];
+            }, $array['embedded']['zaaktinformatieobjecten']
+        );
+
+        return $array;
+
+    }
 
 
 }//end class
