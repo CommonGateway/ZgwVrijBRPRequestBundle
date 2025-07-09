@@ -338,7 +338,14 @@ class RequestService
 
     }//end createRequestHandler()
 
-
+    /**
+     * Fetch file data from the file object
+     *
+     * @param array $array The array of ZIOs.
+     * @param ObjectEntity $object The Zaak object
+     *
+     * @return array The ZIO array with rendered files.
+     */
     private function getDocumentContents(array $array, ObjectEntity $object): array
     {
         if (isset($array['embedded']) === false || isset($array['embedded']['zaakinformatieobjecten']) === false) {
@@ -354,10 +361,9 @@ class RequestService
         }
 
         $array['embedded']['zaakinformatieobjecten'] = array_map(
-            function (array $zio) use ($contents) {
-                $zio['embedded']['informatieobject']['inhoud'] = $contents[$zio['id']];
-            },
-            $array['embedded']['zaaktinformatieobjecten']
+            function(array $zio) use ($contents) {
+                $zio['embedded']['informatieobject']['inhoud'] = $contents[$zio['_self']['id']];
+            }, $array['embedded']['zaakinformatieobjecten']
         );
 
         return $array;
