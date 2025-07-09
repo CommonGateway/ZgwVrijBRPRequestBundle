@@ -338,29 +338,31 @@ class RequestService
 
     }//end createRequestHandler()
 
+
     private function getDocumentContents(array $array, ObjectEntity $object): array
     {
         if (isset($array['embedded']) === false || isset($array['embedded']['zaakinformatieobjecten']) === false) {
             return $array;
         }
+
         $zios = $object->getValueObject('zaakinformatieobjecten')->getObjects();
 
         foreach ($zios as $zio) {
             $eio = $zio->getValueObject('informatieobject')->getObjects()[0];
 
             $contents = [$zio->getId()->toString() => $eio->getValueObject('inhoud')->getFiles()->first()->getBase64()];
-
         }
 
         $array['embedded']['zaakinformatieobjecten'] = array_map(
-            function(array $zio) use ($contents) {
+            function (array $zio) use ($contents) {
                 $zio['embedded']['informatieobject']['inhoud'] = $contents[$zio['id']];
-            }, $array['embedded']['zaaktinformatieobjecten']
+            },
+            $array['embedded']['zaaktinformatieobjecten']
         );
 
         return $array;
 
-    }
+    }//end getDocumentContents()
 
 
 }//end class
