@@ -338,10 +338,11 @@ class RequestService
 
     }//end createRequestHandler()
 
+
     /**
      * Fetch file data from the file object
      *
-     * @param array $array The array of ZIOs.
+     * @param array        $array  The array of ZIOs.
      * @param ObjectEntity $object The Zaak object
      *
      * @return array The ZIO array with rendered files.
@@ -361,10 +362,11 @@ class RequestService
         }
 
         $array['embedded']['zaakinformatieobjecten'] = array_map(
-            function(array $zio) use ($contents) {
+            function (array $zio) use ($contents) {
                 $zio['embedded']['informatieobject']['inhoud'] = $contents[$zio['_self']['id']];
                 return $zio;
-            }, $array['embedded']['zaakinformatieobjecten']
+            },
+            $array['embedded']['zaakinformatieobjecten']
         );
 
         return $array;
