@@ -365,7 +365,8 @@ class RequestService
             function (array $zio) use ($contents) {
                 $zio['embedded']['informatieobject']['inhoud'] = $contents[$zio['_self']['id']];
                 return $zio;
-            }, $array['embedded']['zaakinformatieobjecten']
+            },
+            $array['embedded']['zaakinformatieobjecten']
         );
 
         return $array;
