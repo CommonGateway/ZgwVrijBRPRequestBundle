@@ -358,7 +358,7 @@ class RequestService
         foreach ($zios as $zio) {
             $eio = $zio->getValueObject('informatieobject')->getObjects()[0];
 
-            $contents = [$zio->getId()->toString() => $eio->getValueObject('inhoud')->getFiles()->first()->getBase64()];
+            $contents[$zio->getId()->toString()] = $eio->getValueObject('inhoud')->getFiles()->first()->getBase64();
         }
 
         $array['embedded']['zaakinformatieobjecten'] = array_map(
