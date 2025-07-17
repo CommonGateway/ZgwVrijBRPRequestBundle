@@ -39,8 +39,8 @@ class CasesHandler implements ActionHandlerInterface
         return [
             '$id'         => 'https://example.com/ActionHandler/PetStoreHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'       => 'PetStore ActionHandler',
-            'description' => 'This handler returns a welcoming string',
+            'title'       => 'Check Cases to Request ActionHandler',
+            'description' => 'Checks if there are Cases we need to create a Request for in the requestInbox API',
             'required'    => [],
             'properties'  => [
                 'beforeTimeModifier' => [

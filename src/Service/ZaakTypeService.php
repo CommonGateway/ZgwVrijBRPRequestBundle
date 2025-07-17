@@ -148,7 +148,7 @@ class ZaakTypeService
 
 
     /**
-     * Creates case types from externally fetched request types
+     * Creates case types from externally fetched request types.
      *
      * @param array $data          The data in the request.
      * @param array $configuration The configuration for this handler.
